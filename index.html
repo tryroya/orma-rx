@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2300657C'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%23E2C342' stroke-width='7' stroke-linecap='round' stroke-dasharray='80 15'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
 :root{
   --teal:#00657C; --gold:#E2C342; --deep:#012733; --cool:#0DA6B2; --lightgold:#F3ED86;
@@ -45,7 +45,7 @@ a{color:var(--teal)}
 
 /* landing */
 .hero{background:linear-gradient(160deg,#E9F6F7 0%,#F7FBF3 100%);border:1px solid var(--line);border-radius:24px;padding:26px 22px;margin-top:14px;position:relative;overflow:hidden}
-.hero .ringbg{position:absolute;right:-40px;top:-40px;width:170px;height:170px;opacity:.5}
+.hero-grid{display:grid;gap:26px}
 .hero h1{font-size:27px;line-height:1.22;font-weight:700;color:var(--deep);max-width:20ch}
 .hero p.sub{margin-top:10px;color:var(--mut);font-size:15px;max-width:34ch}
 .pricechip{display:inline-flex;align-items:center;gap:8px;background:var(--deep);color:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;margin-top:14px}
@@ -245,6 +245,42 @@ details.intake .body{padding:0 16px 12px}
 .signedbanner.decl{background:#F6F7F8;border-color:#DCE4E7;color:#4A6A74}
 .docback{background:rgba(255,255,255,.14);color:#fff;border-radius:12px;width:36px;height:36px;font-size:19px;flex:0 0 auto}
 
+/* ── insta-style brand cards (typographic only — Orma social card system, embedded) ── */
+.igc{position:relative;overflow:hidden;border-radius:24px;aspect-ratio:4/5;width:100%;max-width:340px;margin:0 auto;container-type:inline-size;box-shadow:0 22px 60px rgba(1,39,51,.20);isolation:isolate}
+.igc-in{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:8.5%;z-index:3}
+.igc.deepc{background:radial-gradient(120% 60% at 50% 112%,rgba(226,195,66,.40) 0%,rgba(226,195,66,0) 62%),linear-gradient(180deg,#012733 0%,#033B4C 55%,#07536A 100%);color:#fff}
+.igc.goldc{background:radial-gradient(130% 95% at 18% 0%,#EDD35F 0%,var(--gold) 60%);color:var(--deep)}
+.igc .grain{position:absolute;inset:0;z-index:2;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.07'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)'/%3E%3C/svg%3E")}
+.igc .ring{position:absolute;border-radius:50%;border:15px solid rgba(226,195,66,.13);border-width:4.3cqw;z-index:1;animation:igBreathe 7.5s ease-in-out infinite}
+.igc .r1{width:88cqw;height:88cqw;top:-36cqw;right:-30cqw}
+.igc .r2{width:64cqw;height:64cqw;bottom:-28cqw;left:-26cqw;border-color:rgba(13,166,178,.11);animation-delay:1.4s}
+.igc .r3{width:34cqw;height:34cqw;top:44%;right:-12cqw;border-color:rgba(226,195,66,.08);animation-delay:2.6s}
+.igc.goldc .ring{border-color:rgba(1,39,51,.08)}
+.igc .glow{position:absolute;border-radius:50%;filter:blur(50px);z-index:0;pointer-events:none;animation:igDrift 14s ease-in-out infinite alternate}
+.igc .g-gold{width:60cqw;height:60cqw;background:rgba(226,195,66,.30);bottom:-24cqw;left:14cqw}
+.igc .g-cool{width:52cqw;height:52cqw;background:rgba(13,166,178,.24);top:-16cqw;left:-14cqw;animation-delay:4s}
+.igc .star{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--lightgold);z-index:1;animation:igTwinkle 5s ease-in-out infinite}
+.igc .s1{top:14%;left:12%}.igc .s2{top:22%;left:58%;animation-delay:1.1s}.igc .s3{top:38%;left:28%;animation-delay:2.3s;width:3px;height:3px}.igc .s4{top:10%;left:80%;animation-delay:3.2s;width:3px;height:3px}.igc .s5{top:47%;left:74%;animation-delay:4.1s}
+.igc-brand{font-weight:700;font-size:11px;font-size:2.9cqw;letter-spacing:.5em}
+.igc-brand .o{color:var(--gold)}
+.igc.goldc .igc-brand{color:var(--deep)}.igc.goldc .igc-brand .o{color:#fff}
+.igc-mid{display:flex;flex-direction:column;gap:4.5cqw}
+.igc-k{font-size:10px;font-size:2.55cqw;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--cool)}
+.igc.goldc .igc-k{color:var(--teal)}
+.igc-stat{font-weight:800;font-size:62px;font-size:19cqw;line-height:1;letter-spacing:-.03em;color:var(--gold)}
+.igc-h{font-weight:700;font-size:28px;font-size:8cqw;line-height:1.16;letter-spacing:-.01em}
+.igc-h i{font-style:italic;font-weight:300}
+.igc-sub{font-size:11.5px;font-size:3.05cqw;font-weight:300;line-height:1.6;opacity:.92;max-width:34ch}
+.igc-bot{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-size:2.6cqw}
+.igc-bot .u{font-weight:600;color:var(--gold);letter-spacing:.04em}
+.igc.goldc .igc-bot .u{color:var(--teal)}
+.igc-bot .n{font-weight:300;opacity:.65}
+@keyframes igBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.055)}}
+@keyframes igDrift{from{transform:translate(0,0)}to{transform:translate(7cqw,-5cqw)}}
+@keyframes igTwinkle{0%,100%{opacity:.15}50%{opacity:.9}}
+.landrow .igc{margin-top:18px;aspect-ratio:1/1;max-width:320px}
+@media (prefers-reduced-motion:reduce){.igc .ring,.igc .glow,.igc .star{animation:none}}
+
 /* ===== desktop layout (≥900px) — real desktop UI, company default for all Orma sites ===== */
 @media (min-width:900px){
   .shell{max-width:1060px;padding:28px 48px 70px}
@@ -256,14 +292,16 @@ details.intake .body{padding:0 16px 12px}
   .brand{padding:10px 0 8px}
   .brand .wm{font-size:24px}
   .hero{padding:54px 56px;border-radius:30px}
+  .hero-grid{grid-template-columns:1.2fr .8fr;gap:48px;align-items:center}
   .hero h1{font-size:44px;max-width:19ch}
   .hero p.sub{font-size:17px;max-width:52ch}
-  .hero .ringbg{width:300px;height:300px;right:-70px;top:-70px;opacity:.35}
   .hero .cta{width:auto;padding:16px 38px}
+  .hero .igc{max-width:400px;margin:0}
   .stepscard{grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
   .stepitem{flex-direction:column;align-items:flex-start;gap:10px;padding:22px 20px}
-  .landrow{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:stretch}
+  .landrow{display:grid;grid-template-columns:1.1fr .75fr 1fr;gap:14px;align-items:stretch}
   .landrow .need,.landrow .demohint{margin-top:18px}
+  .landrow .igc{aspect-ratio:auto;max-width:none;height:100%;min-height:240px;margin:18px 0 0}
   h2.q{font-size:26px}
   .center .cta{width:fit-content;margin-left:auto;margin-right:auto;padding:15px 40px}
   .dochead{margin:-28px -48px 20px;padding:18px 48px}
@@ -424,12 +462,30 @@ function vLanding(){
  app.innerHTML=`<div class="shell view">
   <div class="brand">${oring(30)}<div class="wm">Orma <span>Rx</span></div><small>a physician-review service</small></div>
   <div class="hero">
-   <div class="ringbg">${oring(170)}</div>
-   <h1>Had a sleep study?<br>Get your CPAP prescription.</h1>
-   <p class="sub">Answer a few questions, snap one photo, and a U.S.-licensed sleep physician reviews your information — and if appropriate, signs your prescription.</p>
-   <div class="pricechip">One flat price&nbsp;<b>$50</b>&nbsp;· typically reviewed within 24 hours</div>
-   <button class="cta" onclick="startApply()">Start my request</button>
-   <div class="fine">For adults 18+ who already have sleep-study results. Orma Rx does not diagnose sleep apnea. If the physician can’t issue your prescription, you get a full refund.</div>
+   <div class="hero-grid">
+    <div>
+     <h1>Had a sleep study?<br>Get your CPAP prescription.</h1>
+     <p class="sub">Answer a few questions, snap one photo, and a U.S.-licensed sleep physician reviews your information — and if appropriate, signs your prescription.</p>
+     <div class="pricechip">One flat price&nbsp;<b>$50</b>&nbsp;· typically reviewed within 24 hours</div>
+     <button class="cta" onclick="startApply()">Start my request</button>
+     <div class="fine">For adults 18+ who already have sleep-study results. Orma Rx does not diagnose sleep apnea. If the physician can’t issue your prescription, you get a full refund.</div>
+    </div>
+    <div class="igc deepc" aria-hidden="true">
+     <div class="glow g-gold"></div><div class="glow g-cool"></div>
+     <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+     <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><span class="star s5"></span>
+     <div class="grain"></div>
+     <div class="igc-in">
+      <div class="igc-brand">ORMA <span class="o">RX</span></div>
+      <div class="igc-mid">
+       <span class="igc-k">Physician-review service</span>
+       <div class="igc-stat">$50</div>
+       <p class="igc-sub">One flat price. Typically reviewed within 24 hours.</p>
+      </div>
+      <div class="igc-bot"><span class="u">Orma Rx</span><span class="n">adults 18+</span></div>
+     </div>
+    </div>
+   </div>
   </div>
   <div class="stepscard">
    <div class="stepitem"><div class="n">1</div><div><b>Upload your sleep study</b><small>We read your name, date of birth, AHI and more right off the report — barely any typing</small></div></div>
@@ -442,6 +498,18 @@ function vLanding(){
     <li>Sleep study report</li>
     <li>Less than 5 min</li>
     <li>Phone’s front camera</li></ul>
+  </div>
+  <div class="igc goldc" aria-hidden="true">
+   <div class="ring r1"></div><div class="ring r2"></div>
+   <div class="grain"></div>
+   <div class="igc-in">
+    <div class="igc-brand">ORMA <span class="o">RX</span></div>
+    <div class="igc-mid">
+     <span class="igc-k">If not prescribed</span>
+     <div class="igc-h">Full <i>refund</i>.</div>
+    </div>
+    <div class="igc-bot"><span class="u">Orma Rx</span><span class="n">test build</span></div>
+   </div>
   </div>
   <div class="demohint">🧪 <b>Demo tip:</b> after you submit, open the <a href="#/doctor" style="color:inherit;font-weight:700">Physician view</a> to see your own case scored and sign it like a reviewer would.</div>
   </div>
