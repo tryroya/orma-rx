@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Orma Rx — Your CPAP prescription, the easy way</title>
+<meta name="description" content="Already had a sleep study? A U.S.-licensed sleep physician reviews your information and, if appropriate, signs your CPAP prescription. $50. Test build.">
+<meta name="theme-color" content="#00657C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2300657C'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='%23E2C342' stroke-width='7' stroke-linecap='round' stroke-dasharray='80 15'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00657C; --gold:#E2C342; --deep:#012733; --cool:#0DA6B2; --lightgold:#F3ED86;
+  --ok:#178A4C; --okbg:#E8F6EE; --bad:#C43D3D; --badbg:#FBEDED;
+  --ink:#012733; --mut:#4A6A74; --line:#DCE9EC; --bg:#F4F9FA; --card:#FFFFFF;
+  --r:18px; --shadow:0 6px 24px rgba(1,39,51,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;min-height:100dvh}
+button{font-family:inherit;cursor:pointer;border:0}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink)}
+img{max-width:100%}
+a{color:var(--teal)}
+
+/* demo ribbon */
+.ribbon{position:sticky;top:0;z-index:50;background:var(--deep);color:var(--lightgold);font-size:11.5px;letter-spacing:.02em;text-align:center;padding:6px 12px}
+.ribbon b{color:var(--gold);font-weight:600}
+
+/* shells */
+.shell{max-width:520px;margin:0 auto;padding:20px 20px calc(110px + env(safe-area-inset-bottom));min-height:70dvh}
+.shell.wide{max-width:880px}
+.view{animation:fadeUp .28s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:10px;padding:6px 0 2px}
+.brand .oring{width:30px;height:30px;flex:0 0 auto}
+.brand .wm{font-weight:700;font-size:21px;color:var(--teal);letter-spacing:.01em}
+.brand .wm span{color:var(--mut);font-weight:600}
+.brand small{margin-left:auto;color:var(--mut);font-size:12px}
+
+/* landing */
+.hero{background:linear-gradient(160deg,#E9F6F7 0%,#F7FBF3 100%);border:1px solid var(--line);border-radius:24px;padding:26px 22px;margin-top:14px;position:relative;overflow:hidden}
+.hero .ringbg{position:absolute;right:-40px;top:-40px;width:170px;height:170px;opacity:.5}
+.hero h1{font-size:27px;line-height:1.22;font-weight:700;color:var(--deep);max-width:20ch}
+.hero p.sub{margin-top:10px;color:var(--mut);font-size:15px;max-width:34ch}
+.pricechip{display:inline-flex;align-items:center;gap:8px;background:var(--deep);color:#fff;border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;margin-top:14px}
+.pricechip b{color:var(--gold);font-size:15px}
+.cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--gold);color:var(--deep);font-weight:700;font-size:17px;border-radius:16px;padding:16px;margin-top:18px;box-shadow:0 8px 20px rgba(226,195,66,.35);transition:transform .12s}
+.cta:active{transform:scale(.98)}
+.cta.secondary{background:#fff;border:1.5px solid var(--line);color:var(--teal);box-shadow:none;font-weight:600}
+.hero .fine{margin-top:12px;font-size:12px;color:var(--mut)}
+
+.stepscard{margin-top:16px;display:grid;gap:10px}
+.stepitem{display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;align-items:center}
+.stepitem .n{width:34px;height:34px;flex:0 0 auto;border-radius:12px;background:#EAF4F6;color:var(--teal);font-weight:700;display:flex;align-items:center;justify-content:center}
+.stepitem b{display:block;font-size:15px}
+.stepitem small{color:var(--mut);font-size:13px}
+.trust{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.trust span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--mut)}
+.need{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.need h3{font-size:14px;color:var(--teal);margin-bottom:8px}
+.need li{list-style:none;padding:4px 0 4px 26px;position:relative;font-size:14px;color:var(--ink)}
+.need li:before{content:"✓";position:absolute;left:2px;color:var(--ok);font-weight:700}
+.demohint{margin-top:16px;background:#FFF9E3;border:1px dashed var(--gold);border-radius:14px;padding:12px 14px;font-size:13px;color:#6B5B13}
+footer{margin-top:26px;padding:18px 4px 8px;border-top:1px solid var(--line);color:var(--mut);font-size:12px;line-height:1.6}
+footer a{color:var(--teal)}
+
+/* wizard */
+.wiztop{display:flex;align-items:center;gap:12px;padding:4px 0 12px}
+.backbtn{background:#fff;border:1px solid var(--line);border-radius:12px;width:38px;height:38px;font-size:17px;color:var(--teal);flex:0 0 auto}
+.prog{flex:1}
+.prog .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:6px}
+.prog .bar{height:6px;background:#E2EEF1;border-radius:99px;overflow:hidden}
+.prog .fill{height:100%;background:linear-gradient(90deg,var(--cool),var(--teal));border-radius:99px;transition:width .3s}
+h2.q{font-size:21px;font-weight:700;color:var(--deep);margin:8px 0 4px}
+p.help{color:var(--mut);font-size:14px;margin-bottom:14px}
+.fgroup{margin-bottom:14px}
+label.f{display:block;font-size:13px;font-weight:600;color:var(--teal);margin-bottom:6px}
+label.f em{font-style:normal;color:var(--mut);font-weight:400}
+.tin,select.tin,textarea.tin{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;outline:none;transition:border .15s}
+.tin:focus{border-color:var(--cool)}
+.tin.bad{border-color:var(--bad);background:#FFFBFB}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.err{color:var(--bad);font-size:12px;margin-top:4px;display:none}
+.err.show{display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-size:14px;color:var(--ink);transition:all .12s}
+.chip.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+.chip.big{width:100%;text-align:left;padding:14px 16px}
+.chip.big small{display:block;font-size:12px;color:var(--mut);font-weight:400;margin-top:2px}
+.chip.big.on small{color:#CFE7EC}
+.whisper{background:#EAF4F6;border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--teal);margin-top:8px}
+.navbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:linear-gradient(to top,var(--bg) 65%,rgba(244,249,250,0));padding:14px 20px calc(14px + env(safe-area-inset-bottom))}
+.navbar .in{max-width:480px;margin:0 auto;display:flex;gap:10px}
+.navbar .cta{margin-top:0}
+.uploadbox{border:1.5px dashed var(--cool);background:#F2FAFB;border-radius:14px;padding:14px;text-align:center;font-size:14px;color:var(--teal);width:100%}
+.filechip{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:8px}
+.filechip img{width:44px;height:44px;object-fit:cover;border-radius:8px}
+.filechip .x{margin-left:auto;color:var(--bad);background:none;font-size:16px}
+
+/* camera */
+.camwrap{background:#000;border-radius:20px;overflow:hidden;position:relative;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center}
+.camwrap video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.camwrap img.shot{width:100%;height:100%;object-fit:cover}
+.camwrap .guide{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.camwrap .guide .oval{width:62%;height:52%;border:2.5px dashed rgba(255,255,255,.75);border-radius:50%}
+.camwrap .hinttxt{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#fff;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.camctl{display:flex;gap:10px;margin-top:12px}
+.snap{width:100%;background:var(--teal);color:#fff;font-weight:700;font-size:16px;border-radius:16px;padding:15px}
+.phototips{display:grid;gap:6px;margin:12px 0}
+.phototips span{font-size:13px;color:var(--mut);padding-left:24px;position:relative}
+.phototips span:before{content:"•";position:absolute;left:8px;color:var(--gold);font-weight:700}
+
+/* review */
+.sumcard{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:4px 16px;margin-bottom:12px}
+.sumrow{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #EEF5F6;font-size:14px}
+.sumrow:last-child{border-bottom:0}
+.sumrow .k{color:var(--mut);flex:0 0 40%}
+.sumrow .v{text-align:right;font-weight:500;overflow-wrap:anywhere}
+.sumhead{display:flex;justify-content:space-between;align-items:center;padding:12px 0 6px}
+.sumhead h3{font-size:14px;color:var(--teal)}
+.sumhead button{background:none;color:var(--cool);font-size:13px;font-weight:600}
+.consent{display:flex;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;font-size:13.5px;align-items:flex-start}
+.consent input{width:20px;height:20px;margin-top:2px;accent-color:var(--teal);flex:0 0 auto}
+.consent.bad{border-color:var(--bad)}
+
+/* pay */
+.ordercard{background:var(--deep);color:#fff;border-radius:20px;padding:20px;margin-bottom:14px}
+.ordercard .l1{display:flex;justify-content:space-between;font-size:14.5px;padding:6px 0;color:#CFE7EC}
+.ordercard .tot{display:flex;justify-content:space-between;font-weight:700;font-size:19px;border-top:1px solid rgba(255,255,255,.18);margin-top:8px;padding-top:12px}
+.ordercard .tot b{color:var(--gold)}
+.ordercard .note{font-size:12px;color:#9FC4CC;margin-top:10px}
+.paycard{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;position:relative}
+.paycard .demobadge{position:absolute;top:-10px;right:14px;background:var(--gold);color:var(--deep);font-size:11px;font-weight:700;border-radius:999px;padding:4px 10px}
+.paycard input{background:#F6FAFB}
+.paycard input:disabled{color:var(--mut)}
+
+/* done */
+.bigcheck{width:86px;height:86px;border-radius:50%;background:var(--okbg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:40px;margin:26px auto 14px;animation:pop .4s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.center{text-align:center}
+.nextsteps{margin-top:18px;text-align:left}
+
+/* doctor */
+.dochead{background:var(--deep);margin:-20px -20px 16px;padding:16px 20px;display:flex;align-items:center;gap:10px;border-radius:0 0 22px 22px}
+.dochead .wm{color:#fff;font-weight:700;font-size:17px}
+.dochead .wm small{display:block;font-size:11.5px;color:#9FC4CC;font-weight:400}
+.dochead .right{margin-left:auto;display:flex;gap:8px}
+.dochead button{background:rgba(255,255,255,.12);color:#DCEFF3;font-size:12px;border-radius:10px;padding:7px 11px}
+.qcard{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s}
+.qcard:active{transform:scale(.99)}
+.avatar{width:46px;height:46px;border-radius:14px;background:#EAF4F6;color:var(--teal);font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.qcard .mid{flex:1;min-width:0}
+.qcard .nm{font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center}
+.qcard .meta{font-size:12.5px;color:var(--mut);margin-top:1px}
+.pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:5px 10px;white-space:nowrap}
+.pill.ok{background:var(--okbg);color:var(--ok)}
+.pill.bad{background:var(--badbg);color:var(--bad)}
+.pill.done{background:#EAF4F6;color:var(--teal)}
+.tagyou{background:var(--gold);color:var(--deep);font-size:10px;font-weight:700;border-radius:6px;padding:2px 6px}
+.verdict{border-radius:20px;padding:18px;color:#fff;margin-bottom:14px;box-shadow:var(--shadow)}
+.verdict.ok{background:linear-gradient(135deg,#1D9E58,#127A44)}
+.verdict.bad{background:linear-gradient(135deg,#D05252,#B23434)}
+.verdict .big{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.verdict .sub{font-size:13px;opacity:.92;margin-top:4px}
+.verdict .cnt{margin-left:auto;background:rgba(255,255,255,.2);border-radius:999px;padding:4px 11px;font-size:13px;font-weight:700}
+.checks{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:6px 0;margin-bottom:14px}
+.checkrow{display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid #F0F6F7;align-items:flex-start}
+.checkrow:last-child{border-bottom:0}
+.ic{width:24px;height:24px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-top:1px}
+.ic.ok{background:var(--okbg);color:var(--ok)}
+.ic.bad{background:var(--badbg);color:var(--bad)}
+.checkrow b{font-size:13.5px;display:block}
+.checkrow small{color:var(--mut);font-size:12.5px;line-height:1.45}
+.dcard{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.dcard h3{font-size:13px;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.dcard .thumb{width:100%;max-height:300px;object-fit:cover;border-radius:14px;cursor:zoom-in}
+.aisum{background:#F2FAFB;border:1px solid #D5ECEF;border-radius:var(--r);padding:16px;margin-bottom:14px;font-size:14px}
+.aisum h3{font-size:12px;color:var(--cool);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.aisum .foot{font-size:11.5px;color:var(--mut);margin-top:10px;border-top:1px solid #D5ECEF;padding-top:8px}
+details.intake{background:#fff;border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+details.intake summary{padding:14px 16px;font-weight:600;font-size:14px;color:var(--teal);cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.intake summary:after{content:"▾";color:var(--mut)}
+details.intake[open] summary:after{content:"▴"}
+details.intake .body{padding:0 16px 12px}
+.signbox{background:#fff;border:2px solid var(--gold);border-radius:20px;padding:18px;margin-bottom:14px}
+.signbox h3{font-size:15px;margin-bottom:10px}
+.rxprev{font-size:13.5px;color:var(--ink);background:#FBF9EE;border-radius:12px;padding:12px;margin-bottom:12px;line-height:1.6}
+.signbtn{width:100%;background:var(--ok);color:#fff;font-weight:700;font-size:16px;border-radius:14px;padding:15px;margin-top:10px}
+.signbtn:disabled{background:#B9CDD2;cursor:not-allowed}
+.declinebtn{width:100%;background:var(--bad);color:#fff;font-weight:700;font-size:15px;border-radius:14px;padding:14px;margin-top:10px}
+.ghostbtn{width:100%;background:none;color:var(--mut);font-size:13px;padding:10px;text-decoration:underline}
+.signedbanner{background:var(--okbg);border:1px solid #BFE5CD;color:var(--ok);border-radius:14px;padding:14px;font-weight:600;font-size:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.signedbanner a{color:var(--ok)}
+
+/* rx doc */
+.rxsheet{background:#fff;border:1px solid var(--line);border-radius:8px;padding:30px 26px;position:relative;overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+.rxsheet .lh{display:flex;align-items:center;gap:10px;border-bottom:2.5px solid var(--teal);padding-bottom:14px;margin-bottom:16px}
+.rxsheet .lh .t{font-weight:700;color:var(--teal);font-size:19px}
+.rxsheet .lh small{display:block;color:var(--mut);font-weight:400;font-size:11.5px}
+.rxsheet .blk{margin-bottom:14px}
+.rxsheet .blk h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:4px}
+.rxsheet .rxbody{border:1px solid var(--line);border-radius:10px;padding:14px;line-height:1.7}
+.rxsheet .sig{margin-top:22px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.rxsheet .sig .name{font-family:'Caveat',cursive;font-size:30px;color:var(--deep);border-bottom:1.5px solid var(--ink);padding:0 10px 2px;min-width:180px}
+.rxsheet .sig small{color:var(--mut);font-size:11px}
+.watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.watermark span{transform:rotate(-24deg);font-size:44px;font-weight:800;color:rgba(196,61,61,.13);border:4px solid rgba(196,61,61,.13);border-radius:14px;padding:8px 22px;white-space:nowrap}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:rgba(1,39,51,.75);z-index:90;display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay img{max-width:100%;max-height:86dvh;border-radius:14px}
+.modal{background:#fff;border-radius:20px;max-width:460px;width:100%;max-height:82dvh;overflow:auto;padding:22px}
+.modal h3{color:var(--teal);margin-bottom:10px;font-size:17px}
+.modal .crit{padding:9px 0;border-bottom:1px solid #EEF5F6;font-size:13.5px}
+.modal .crit b{color:var(--deep)}
+.modal .close{width:100%;margin-top:14px;background:var(--teal);color:#fff;border-radius:12px;padding:12px;font-weight:600}
+.toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--deep);color:#fff;font-size:13.5px;border-radius:12px;padding:11px 18px;z-index:95;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+
+@media print{
+  .ribbon,.noprint,.navbar{display:none!important}
+  body{background:#fff}
+  .shell{padding:0;max-width:none}
+  .rxsheet{border:0;box-shadow:none}
+}
+/* queue sections + completed examples */
+.learnnote{background:#F2FAFB;border:1px solid #D5ECEF;border-radius:14px;padding:12px 14px;font-size:13px;color:var(--ink);margin-bottom:14px;line-height:1.5}
+.seclabel{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.06em;text-transform:uppercase;margin:18px 0 8px}
+.seclabel small{font-weight:400;text-transform:none;letter-spacing:0}
+.qlist{display:grid;gap:10px;grid-template-columns:1fr}
+.qlist .qcard{margin-bottom:0}
+.pill.decl{background:#F0F3F4;color:#5E7A83}
+.signedbanner.decl{background:#F6F7F8;border-color:#DCE4E7;color:#4A6A74}
+.docback{background:rgba(255,255,255,.14);color:#fff;border-radius:12px;width:36px;height:36px;font-size:19px;flex:0 0 auto}
+
+/* ===== desktop layout (≥900px) — real desktop UI, company default for all Orma sites ===== */
+@media (min-width:900px){
+  .shell{max-width:1060px;padding:28px 48px 70px}
+  .shell.narrow{max-width:660px;padding:28px 24px 40px}
+  .shell.wide{max-width:1200px}
+  .navbar{position:static;background:none;padding:6px 0 34px}
+  .navbar .in{max-width:660px;margin:0 auto;justify-content:flex-end;padding:0 24px}
+  .navbar .cta{width:auto;min-width:240px}
+  .brand{padding:10px 0 8px}
+  .brand .wm{font-size:24px}
+  .hero{padding:54px 56px;border-radius:30px}
+  .hero h1{font-size:44px;max-width:19ch}
+  .hero p.sub{font-size:17px;max-width:52ch}
+  .hero .ringbg{width:300px;height:300px;right:-70px;top:-70px;opacity:.35}
+  .hero .cta{width:auto;padding:16px 38px}
+  .stepscard{grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+  .stepitem{flex-direction:column;align-items:flex-start;gap:10px;padding:22px 20px}
+  .landrow{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:stretch}
+  .landrow .need,.landrow .demohint{margin-top:18px}
+  h2.q{font-size:26px}
+  .center .cta{width:fit-content;margin-left:auto;margin-right:auto;padding:15px 40px}
+  .dochead{margin:-28px -48px 20px;padding:18px 48px}
+  .qlist{grid-template-columns:1fr 1fr;gap:12px}
+  .casegrid{display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-areas:"main side" "action side";column-gap:20px;align-items:start}
+  .colmain{grid-area:main}.colside{grid-area:side}.actionarea{grid-area:action}
+  .colside .row2{grid-template-columns:1fr}
+  .rxsheet{padding:44px 46px}
+}
+</style>
+</head>
+<body>
+<div class="ribbon noprint"><b>TEST BUILD</b> — demo only · no real prescriptions · no payment is charged · your entries stay on this device</div>
+<div id="app"></div>
+<noscript><div style="padding:30px;text-align:center">Orma Rx needs JavaScript enabled.</div></noscript>
+
+<script>
+"use strict";
+/* ============ helpers ============ */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const STATES=["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+const NOW=new Date();
+function toast(m){document.querySelectorAll(".toast").forEach(t=>t.remove());const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+function ageFromDOB(d){if(!d)return null;const b=new Date(d);let a=NOW.getFullYear()-b.getFullYear();const m=NOW.getMonth()-b.getMonth();if(m<0||(m===0&&NOW.getDate()<b.getDate()))a--;return a;}
+function studyAgeMonths(m,y){if(!y)return null;return (NOW.getFullYear()-y)*12+(NOW.getMonth()-(m??0));}
+function oring(sz){return `<svg class="oring" viewBox="0 0 64 64" width="${sz||30}" height="${sz||30}"><circle cx="32" cy="32" r="22" fill="none" stroke="#E2C342" stroke-width="11" stroke-linecap="round" stroke-dasharray="118 22" transform="rotate(-45 32 32)"/></svg>`;}
+function svgTongue(v){const hue=v===1?"#E9B8A6":v===2?"#E4A893":"#DFAF9E";
+return `<svg viewBox="0 0 300 400" style="width:100%;max-height:300px;border-radius:14px;background:#F3E3DC" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="150" cy="200" rx="118" ry="158" fill="${hue}"/>
+<ellipse cx="150" cy="255" rx="70" ry="62" fill="#7E2B33"/>
+<path d="M150 200 q-46 6 -52 40 q0 46 52 60 q52 -14 52 -60 q-6 -34 -52 -40" fill="#C96A72"/>
+<line x1="150" y1="238" x2="150" y2="292" stroke="#B25560" stroke-width="4"/>
+<ellipse cx="150" cy="212" rx="9" ry="14" fill="#A83E4C"/>
+<ellipse cx="112" cy="140" rx="12" ry="7" fill="#8A5A4E"/><ellipse cx="188" cy="140" rx="12" ry="7" fill="#8A5A4E"/>
+<text x="150" y="382" text-anchor="middle" font-family="Poppins,sans-serif" font-size="15" fill="#8A5A4E">Sample photo (illustration)</text>
+</svg>`;}
+
+/* ============ storage ============ */
+const store={
+  get subs(){try{return JSON.parse(localStorage.getItem("ormaRxSubs")||"[]");}catch(e){return[];}},
+  set subs(v){localStorage.setItem("ormaRxSubs",JSON.stringify(v));},
+  get signed(){try{return JSON.parse(localStorage.getItem("ormaRxSigned")||"{}");}catch(e){return{};}},
+  set signed(v){localStorage.setItem("ormaRxSigned",JSON.stringify(v));},
+  get declined(){try{return JSON.parse(localStorage.getItem("ormaRxDeclined")||"{}");}catch(e){return{};}},
+  set declined(v){localStorage.setItem("ormaRxDeclined",JSON.stringify(v));},
+  get draft(){try{return JSON.parse(localStorage.getItem("ormaRxDraft")||"null");}catch(e){return null;}},
+  set draft(v){localStorage.setItem("ormaRxDraft",JSON.stringify(v));}
+};
+function blankDraft(){return {first:"",last:"",dob:"",sex:"",state:"",email:"",phone:"",
+ sType:"",sMonth:null,sYear:null,ahi:"",dxed:"",pattern:"",report:null,
+ hFt:"",hIn:"",wLb:"",symptoms:[],conds:[],opioids:"",safety:[],meds:"",
+ photo:null,photoKind:null,cTele:false,cTruth:false};}
+let draft=store.draft||blankDraft();
+function saveDraft(){store.draft=draft;}
+
+/* ============ sample cases ============ */
+const SAMPLES=[
+ {id:"s1",sample:true,ts:NOW.getTime()-9.5*36e5,first:"Sandra",last:"Okafor",dob:"1968-04-11",sex:"Female",state:"CA",email:"s.okafor@example.com",phone:"(415) 555-0164",
+  sType:"In-lab sleep study",sMonth:2,sYear:2026,ahi:"31.4",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"PSG_report_okafor.pdf",kind:"pdf"},
+  hFt:"5",hIn:"4",wLb:"198",symptoms:["Loud snoring","Breathing pauses seen by someone else","Daytime sleepiness"],conds:["High blood pressure"],opioids:"No",safety:[],meds:"Lisinopril 10 mg",
+  photo:"svg1",photoKind:"sample",cTele:true,cTruth:true},
+ {id:"s2",sample:true,ts:NOW.getTime()-26*36e5,first:"Miguel",last:"Ferreira",dob:"1982-09-02",sex:"Male",state:"TX",email:"miguel.f@example.com",phone:"(512) 555-0198",
+  sType:"Home sleep test",sMonth:5,sYear:2026,ahi:"9.2",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"HST_summary_ferreira.jpg",kind:"img",thumb:null},
+  hFt:"5",hIn:"10",wLb:"212",symptoms:["Daytime sleepiness","Loud snoring"],conds:["High blood pressure"],opioids:"No",safety:[],meds:"",
+  photo:"svg2",photoKind:"sample",cTele:true,cTruth:true},
+ {id:"s3",sample:true,ts:NOW.getTime()-49*36e5,first:"Raymond",last:"Whitfield",dob:"1959-01-27",sex:"Male",state:"FL",email:"rwhitfield@example.com",phone:"(305) 555-0113",
+  sType:"In-lab sleep study",sMonth:4,sYear:2026,ahi:"28.1",dxed:"Yes",pattern:"Mostly central",report:{name:"PSG_report_whitfield.pdf",kind:"pdf"},
+  hFt:"5",hIn:"9",wLb:"176",symptoms:["Daytime sleepiness","Morning headaches"],conds:["Heart failure"],opioids:"Yes",safety:[],meds:"Furosemide, carvedilol, oxycodone 10 mg daily",
+  photo:"svg3",photoKind:"sample",cTele:true,cTruth:true},
+ /* completed examples — show how finished reviews look */
+ {id:"s4",sample:true,ts:NOW.getTime()-3*864e5,first:"Janet",last:"Kowalski",dob:"1971-06-19",sex:"Female",state:"AZ",email:"j.kowalski@example.com",phone:"(602) 555-0142",
+  sType:"Home sleep test",sMonth:3,sYear:2026,ahi:"22.7",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"HST_report_kowalski.pdf",kind:"pdf"},
+  hFt:"5",hIn:"6",wLb:"189",symptoms:["Loud snoring","Daytime sleepiness"],conds:["High blood pressure"],opioids:"No",safety:[],meds:"Amlodipine 5 mg",
+  photo:"svg2",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"signed",name:"Dr. Elena Vasquez",ts:NOW.getTime()-2.6*864e5,device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",override:false,rationale:""}},
+ {id:"s5",sample:true,ts:NOW.getTime()-4*864e5,first:"Albert",last:"Nguyen",dob:"1963-11-08",sex:"Male",state:"WA",email:"a.nguyen@example.com",phone:"(206) 555-0177",
+  sType:"In-lab sleep study",sMonth:9,sYear:2019,ahi:"17.9",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"PSG_report_nguyen_2019.pdf",kind:"pdf"},
+  hFt:"5",hIn:"11",wLb:"204",symptoms:["Loud snoring","Daytime sleepiness"],conds:["None of these"],opioids:"No",safety:[],meds:"",
+  photo:"svg3",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"declined",name:"Dr. Elena Vasquez",ts:NOW.getTime()-3.5*864e5,note:"Thank you for your Orma Rx request. I can’t prescribe from your October 2019 study — it’s outside the 5-year window, and suppliers and insurers want recent numbers.\n\nWhat to do next: a new home sleep test gives current results in about a week. Once you have the report, resubmit and I’ll finish your review quickly.\n\nYour $50 has been refunded in full."}},
+ {id:"s6",sample:true,ts:NOW.getTime()-5*864e5,first:"Grace",last:"Ellison",dob:"1979-02-14",sex:"Female",state:"CO",email:"g.ellison@example.com",phone:"(720) 555-0126",
+  sType:"Home sleep test",sMonth:4,sYear:2026,ahi:"7.8",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"HST_report_ellison.pdf",kind:"pdf"},
+  hFt:"5",hIn:"5",wLb:"151",symptoms:["Loud snoring","Breathing pauses seen by someone else"],conds:["None of these"],opioids:"No",safety:[],meds:"",
+  photo:"svg1",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"signed",name:"Dr. Elena Vasquez",ts:NOW.getTime()-4.4*864e5,device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",override:true,rationale:"AHI 7.8 under-calls it: partner reports nightly witnessed apneas and the attached report notes Epworth 14/24 — clinically significant despite the mild index. A PAP trial is warranted."}}
+];
+function allCases(){const local=store.subs.slice().sort((a,b)=>b.ts-a.ts);return [...local,...SAMPLES];}
+function getCase(id){return allCases().find(c=>c.id===id);}
+
+/* ============ criteria engine v0.1 (physician-approved ruleset pending — see ruleset modal) ============ */
+const QUALIFIERS_SYM=["Daytime sleepiness","Trouble concentrating","Low mood","Trouble sleeping (insomnia)"];
+const QUALIFIERS_CON=["High blood pressure","Heart disease (ischemic)","Stroke history"];
+function evaluate(c){
+  const checks=[];const age=ageFromDOB(c.dob);const ahi=parseFloat(c.ahi);
+  const sAge=studyAgeMonths(c.sMonth,c.sYear);
+  const push=(id,label,pass,evidence)=>checks.push({id,label,pass,evidence});
+  push("C1","Adult (18+)",age!==null&&age>=18,age!==null?`Age ${age} from date of birth on file.`:"Date of birth missing.");
+  const idOk=!!(c.first&&c.last&&c.dob&&c.sex&&c.state&&c.email);
+  push("C2","Identity & state complete",idOk,idOk?`${esc(c.first)} ${esc(c.last)}, ${esc(c.sex)}, ${esc(c.state)} — contact on file.`:"Missing identity or contact fields.");
+  const studyOk=!!(c.sType&&c.sYear&&!isNaN(ahi)&&(c.dxed==="Yes"||c.dxed==="Not sure"));
+  push("C3","Sleep study documented",studyOk,studyOk?`${c.sType}, ${MONTHS[c.sMonth]} ${c.sYear} — AHI ${ahi} events/hr reported${c.report?`; report attached (${esc(c.report.name)})`:"; no report file attached"}.`:"Study type, date, or AHI missing.");
+  const recOk=sAge!==null&&sAge<=60;
+  push("C4","Study within 5 years",recOk,sAge===null?"Study date missing.":`Study is ${sAge<1?"less than a month":sAge+" months"} old${recOk?" — within the 5-year window. Note: some payers/DME require testing within 12 months.":" — outside the 5-year window; repeat testing typically required."}`);
+  let sevOk=false,sevEv="";
+  if(!isNaN(ahi)){
+    if(ahi>=15){sevOk=true;sevEv=`AHI ${ahi} ≥ 15 — meets the primary threshold (${ahi>=30?"severe":"moderate"} range).`;}
+    else if(ahi>=5){const q=[...c.symptoms.filter(s=>QUALIFIERS_SYM.includes(s)),...c.conds.filter(s=>QUALIFIERS_CON.includes(s))];
+      sevOk=q.length>0;sevEv=sevOk?`AHI ${ahi} (5–14.9, mild) WITH qualifier(s): ${q.join(", ")} — meets the mild-plus-qualifier rule.`:`AHI ${ahi} (5–14.9) with no reported qualifying symptom or comorbidity.`;}
+    else{sevEv=`AHI ${ahi} < 5 — below the prescribing threshold.`;}
+  } else sevEv="AHI not provided.";
+  push("C5","OSA severity threshold",sevOk,sevEv);
+  let obsOk=true,obsEv="";
+  const csaRisk=c.conds.includes("Heart failure")||c.opioids==="Yes";
+  if(c.pattern==="Mostly central"){obsOk=false;obsEv="Study reported as predominantly CENTRAL apnea — CPAP may be inappropriate; consider BiPAP-ST/ASV work-up.";}
+  else if(c.pattern==="Mostly obstructive"){obsEv="Study reported as predominantly obstructive."+(csaRisk?" CSA risk factors present ("+(c.conds.includes("Heart failure")?"heart failure":"")+(c.conds.includes("Heart failure")&&c.opioids==="Yes"?" + ":"")+(c.opioids==="Yes"?"daily opioids":"")+") — flagged for physician attention.":"");}
+  else{if(csaRisk){obsOk=false;obsEv="Apnea type unknown AND central-apnea risk factors present ("+[c.conds.includes("Heart failure")?"heart failure":null,c.opioids==="Yes"?"daily opioid use":null].filter(Boolean).join(", ")+") — physician evaluation needed before auto-CPAP.";}
+   else obsEv="Patient unsure of apnea type; no central-apnea risk factors reported.";}
+  push("C6","Obstructive predominance",obsOk,obsEv);
+  const safList=(c.safety||[]).filter(x=>x!=="None of these");
+  const safOk=safList.length===0;
+  push("C7","No structural/safety red flags",safOk,safOk?"None of the screened red flags reported (recent facial surgery/injury, CSF leak or skull surgery, recent pneumothorax, severe nosebleeds).":"Reported: "+safList.join("; ")+" — needs physician evaluation before PAP.");
+  push("C8","Airway exam evidence (photo)",!!c.photo,c.photo?(c.photoKind==="sample"?"Sample oropharynx photo on file (demo). Physician-viewed only — never machine-analyzed.":"Self-captured oropharynx photo on file. Physician-viewed only — never machine-analyzed."):"No airway photo captured.");
+  push("C9","Consents & attestation",!!(c.cTele&&c.cTruth),(c.cTele&&c.cTruth)?"Telehealth consent + truthful-information attestation checked.":"Consent or attestation missing.");
+  const passed=checks.filter(x=>x.pass).length;
+  return {green:passed===checks.length,passed,total:checks.length,checks};
+}
+function bmi(c){const h=(parseInt(c.hFt)||0)*12+(parseInt(c.hIn)||0);const w=parseFloat(c.wLb);if(!h||!w)return null;return Math.round(w*703/(h*h)*10)/10;}
+function aiSummary(c,v){const age=ageFromDOB(c.dob);const ahi=parseFloat(c.ahi);const sev=isNaN(ahi)?"unquantified":ahi>=30?"severe":ahi>=15?"moderate":ahi>=5?"mild":"sub-threshold";
+  const b=bmi(c);let s=`${age}-year-old ${c.sex?c.sex.toLowerCase():"patient"} in ${c.state} with ${sev} OSA by report (AHI ${isNaN(ahi)?"—":ahi}, ${c.sType?c.sType.toLowerCase():"study"}, ${MONTHS[c.sMonth]||""} ${c.sYear||""}${b?`; BMI ${b}`:""}). `;
+  if(c.symptoms.length)s+=`Reports ${c.symptoms.map(x=>x.toLowerCase()).join(", ")}. `;
+  if(c.conds.length&&!c.conds.includes("None of these"))s+=`History: ${c.conds.map(x=>x.toLowerCase()).join(", ")}${c.opioids==="Yes"?", daily opioid use":""}. `;
+  else if(c.opioids==="Yes")s+=`Daily opioid use reported. `;
+  const fails=v.checks.filter(x=>!x.pass);
+  s+=fails.length?`Pre-review: ${v.passed}/${v.total} checks — attention needed on ${fails.map(f=>f.label.toLowerCase()).join("; ")}.`:`Pre-review: all ${v.total} checks met; queue-ready for signature.`;
+  return s;}
+
+/* ============ router ============ */
+let cam=null;
+function stopCam(){if(cam){cam.getTracks().forEach(t=>t.stop());cam=null;}}
+window.addEventListener("hashchange",render);
+function nav(h){location.hash=h;}
+function render(){
+  stopCam();window.scrollTo(0,0);
+  const h=location.hash||"#/";
+  if(h.startsWith("#/apply/"))return vWizard(parseInt(h.split("/")[2])||1);
+  if(h==="#/done")return vDone();
+  if(h==="#/doctor")return vQueue();
+  if(h.startsWith("#/doctor/"))return vCase(h.split("/")[2]);
+  if(h.startsWith("#/rx/"))return vRx(h.split("/")[2]);
+  return vLanding();
+}
+
+/* ============ landing ============ */
+function vLanding(){
+ app.innerHTML=`<div class="shell view">
+  <div class="brand">${oring(30)}<div class="wm">Orma <span>Rx</span></div><small>a physician-review service</small></div>
+  <div class="hero">
+   <div class="ringbg">${oring(170)}</div>
+   <h1>Had a sleep study?<br>Get your CPAP prescription.</h1>
+   <p class="sub">Answer a few questions, snap one photo, and a U.S.-licensed sleep physician reviews your information — and if appropriate, signs your prescription.</p>
+   <div class="pricechip">One flat price&nbsp;<b>$50</b>&nbsp;· typically reviewed within 24 hours</div>
+   <button class="cta" onclick="startApply()">Start my request</button>
+   <div class="fine">For adults 18+ who already have sleep-study results. Orma Rx does not diagnose sleep apnea. If the physician can’t issue your prescription, you get a full refund.</div>
+  </div>
+  <div class="stepscard">
+   <div class="stepitem"><div class="n">1</div><div><b>Your sleep study</b><small>Type, date, and your AHI — from any lab or home test</small></div></div>
+   <div class="stepitem"><div class="n">2</div><div><b>Quick health questions + one photo</b><small>5 minutes, on your phone — includes a photo of your tongue for the physician’s airway exam</small></div></div>
+   <div class="stepitem"><div class="n">3</div><div><b>Physician review & prescription</b><small>A licensed sleep physician reviews and, if appropriate, signs. Use it at any CPAP supplier.</small></div></div>
+  </div>
+  <div class="trust"><span>Reviewed by licensed sleep physicians</span><span>Valid at the supplier of your choice</span><span>Full refund if not prescribed</span></div>
+  <div class="landrow">
+  <div class="need"><h3>WHAT YOU’LL NEED</h3><ul>
+    <li>Sleep study report</li>
+    <li>Less than 5 min</li>
+    <li>Phone’s front camera</li></ul>
+  </div>
+  <div class="demohint">🧪 <b>Demo tip:</b> after you submit, open the <a href="#/doctor" style="color:inherit;font-weight:700">Physician view</a> to see your own case scored and sign it like a reviewer would.</div>
+  </div>
+  <footer>
+    Orma Rx is a physician-review service operated with independent licensed physicians. It does not diagnose any medical condition and requires existing sleep-study results. Not for emergencies — if you have severe trouble breathing, call 911.<br><br>
+    <b>Test build</b> — for product feedback only. No real prescriptions are issued, no payment is charged, and nothing you enter leaves this device.<br><br>
+    © 2026 Orma Sleep, Inc. · <a href="#/doctor">Physician view</a> · <a href="javascript:resetDemo()">Restart demo</a>
+  </footer>
+ </div>`;
+}
+function startApply(){draft=store.draft||blankDraft();nav("#/apply/1");}
+function resetDemo(){localStorage.removeItem("ormaRxSubs");localStorage.removeItem("ormaRxSigned");localStorage.removeItem("ormaRxDeclined");localStorage.removeItem("ormaRxDraft");draft=blankDraft();toast("Demo reset");nav("#/");render();}
+
+/* ============ wizard ============ */
+const STEPS=["Basics","Sleep study","Health","Photo","Review","Payment"];
+function wizChrome(step,inner,nextLabel){
+ app.innerHTML=`<div class="shell narrow view">
+  <div class="wiztop">
+   <button class="backbtn" onclick="wizBack(${step})">‹</button>
+   <div class="prog"><div class="lbl"><span>${STEPS[step-1]}</span><span>Step ${step} of 6 · ~5 min</span></div>
+   <div class="bar"><div class="fill" style="width:${Math.round(step/6*100)}%"></div></div></div>
+  </div>
+  <div id="stepbody">${inner}</div>
+ </div>
+ <div class="navbar noprint"><div class="in"><button class="cta" id="nextbtn" onclick="wizNext(${step})">${nextLabel||"Continue"}</button></div></div>`;
+}
+function wizBack(step){if(step<=1){nav("#/");}else nav("#/apply/"+(step-1));}
+function wizNext(step){
+ const v=validators[step]();
+ if(v!==true){toast(v);return;}
+ saveDraft();
+ if(step>=6){submitDraft();}else nav("#/apply/"+(step+1));
+}
+function chip(field,val,label,multi,sub){
+ const on=multi?(draft[field]||[]).includes(val):draft[field]===val;
+ return `<button class="chip ${sub?"big":""} ${on?"on":""}" onclick="chipTap('${field}','${esc(val)}',${multi?1:0},${arguments[5]||0})">${label}${sub?`<small>${sub}</small>`:""}</button>`;
+}
+function chipTap(field,val,multi,rerenderStep){
+ if(multi){const a=draft[field]||[];
+  if(val==="None of these"){draft[field]=a.includes(val)?[]:["None of these"];}
+  else{const i=a.indexOf(val);if(i>=0)a.splice(i,1);else{a.push(val);const n=a.indexOf("None of these");if(n>=0)a.splice(n,1);}draft[field]=a;}
+ }else draft[field]=draft[field]===val?"":val;
+ saveDraft();render();
+}
+function bindText(id,field){const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{draft[field]=el.value;saveDraft();});}
+
+/* step 1 basics */
+function step1(){
+ wizChrome(1,`
+  <h2 class="q">Let’s start with you</h2>
+  <p class="help">This goes on your prescription, so make it match your ID.</p>
+  <div class="row2">
+   <div class="fgroup"><label class="f">First name</label><input class="tin" id="f_first" value="${esc(draft.first)}" autocomplete="given-name"></div>
+   <div class="fgroup"><label class="f">Last name</label><input class="tin" id="f_last" value="${esc(draft.last)}" autocomplete="family-name"></div>
+  </div>
+  <div class="row2">
+   <div class="fgroup"><label class="f">Date of birth</label><input class="tin" id="f_dob" type="date" value="${esc(draft.dob)}" max="${NOW.toISOString().slice(0,10)}"></div>
+   <div class="fgroup"><label class="f">State</label><select class="tin" id="f_state"><option value="">Select…</option>${STATES.map(s=>`<option ${draft.state===s?"selected":""}>${s}</option>`).join("")}</select></div>
+  </div>
+  <div class="fgroup"><label class="f">Sex at birth <em>(used for your clinical review)</em></label>
+   <div class="chips">${chip("sex","Female","Female")}${chip("sex","Male","Male")}${chip("sex","Other","Other")}</div></div>
+  <div class="fgroup"><label class="f">Email <em>(your prescription is delivered here)</em></label><input class="tin" id="f_email" type="email" inputmode="email" value="${esc(draft.email)}" autocomplete="email"></div>
+  <div class="fgroup"><label class="f">Mobile phone <em>(optional)</em></label><input class="tin" id="f_phone" type="tel" inputmode="tel" value="${esc(draft.phone)}" autocomplete="tel"></div>
+ `);
+ bindText("f_first","first");bindText("f_last","last");bindText("f_email","email");bindText("f_phone","phone");
+ $("#f_dob").addEventListener("change",e=>{draft.dob=e.target.value;saveDraft();});
+ $("#f_state").addEventListener("change",e=>{draft.state=e.target.value;saveDraft();});
+}
+
+/* step 2 study */
+function step2(){
+ const years=[];for(let y=NOW.getFullYear();y>=2016;y--)years.push(y);
+ wizChrome(2,`
+  <h2 class="q">Your sleep study</h2>
+  <p class="help">Any lab or home test counts. Grab your report if you have it.</p>
+  <div class="fgroup"><label class="f">What kind of study?</label>
+   ${chip("sType","In-lab sleep study","In-lab sleep study",0,"Overnight in a sleep center (polysomnography)",2)}
+   <div style="height:8px"></div>
+   ${chip("sType","Home sleep test","Home sleep test",0,"A take-home kit you wore for a night",2)}
+  </div>
+  <div class="fgroup"><label class="f">When was it?</label>
+   <div class="row2">
+    <select class="tin" id="f_smonth"><option value="">Month…</option>${MONTHS.map((m,i)=>`<option value="${i}" ${draft.sMonth===i?"selected":""}>${m}</option>`).join("")}</select>
+    <select class="tin" id="f_syear"><option value="">Year…</option>${years.map(y=>`<option ${draft.sYear===y?"selected":""}>${y}</option>`).join("")}</select>
+   </div></div>
+  <div class="fgroup"><label class="f">Your AHI <em>(events per hour)</em></label>
+   <input class="tin" id="f_ahi" type="number" step="0.1" min="0" max="150" inputmode="decimal" placeholder="e.g. 18.5" value="${esc(draft.ahi)}">
+   <div class="whisper">📄 On your report, look for <b>“AHI”</b> (or “RDI”) — usually on the first page, as events per hour.</div></div>
+  <div class="fgroup"><label class="f">Were you told you have sleep apnea?</label>
+   <div class="chips">${chip("dxed","Yes","Yes")}${chip("dxed","Not sure","Not sure")}</div></div>
+  <div class="fgroup"><label class="f">Did the report say the events were…</label>
+   <div class="chips">${chip("pattern","Mostly obstructive","Mostly obstructive")}${chip("pattern","Mostly central","Mostly central")}${chip("pattern","Not sure","Not sure")}</div>
+   <div class="whisper">Most sleep apnea is <b>obstructive</b>. “Central” appears on the report as central apneas — if unsure, pick “Not sure”.</div></div>
+  <div class="fgroup"><label class="f">Attach your report <em>(recommended — speeds review)</em></label>
+   ${draft.report?`<div class="filechip">${draft.report.kind==="img"&&draft.report.thumb?`<img src="${draft.report.thumb}">`:"📄"} <span>${esc(draft.report.name)}</span><button class="x" onclick="draft.report=null;saveDraft();render()">✕</button></div>`
+   :`<button class="uploadbox" onclick="$('#f_report').click()">📎 Tap to attach a photo or PDF of your report</button><input type="file" id="f_report" accept="image/*,.pdf" style="display:none">`}
+  </div>
+ `);
+ bindText("f_ahi","ahi");
+ const ms=$("#f_smonth");if(ms)ms.addEventListener("change",e=>{draft.sMonth=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
+ const ys=$("#f_syear");if(ys)ys.addEventListener("change",e=>{draft.sYear=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
+ const fr=$("#f_report");if(fr)fr.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+   if(f.type==="application/pdf"){draft.report={name:f.name,kind:"pdf"};saveDraft();render();}
+   else{downscale(f,1000,.8,(url)=>{draft.report={name:f.name,kind:"img",thumb:url};saveDraft();render();});}});
+}
+function downscale(file,maxDim,q,cb){const img=new Image();img.onload=()=>{const sc=Math.min(1,maxDim/Math.max(img.width,img.height));
+ const cv=document.createElement("canvas");cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
+ cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL("image/jpeg",q));URL.revokeObjectURL(img.src);};
+ img.src=URL.createObjectURL(file);}
+
+/* step 3 health */
+function step3(){
+ const fts=["4","5","6","7"],ins=[...Array(12).keys()];
+ wizChrome(3,`
+  <h2 class="q">A few health questions</h2>
+  <p class="help">These are the same questions a sleep clinic would ask.</p>
+  <div class="fgroup"><label class="f">Height & weight</label>
+   <div class="row3">
+    <select class="tin" id="f_hft"><option value="">ft…</option>${fts.map(f=>`<option ${draft.hFt===f?"selected":""}>${f}</option>`).join("")}</select>
+    <select class="tin" id="f_hin"><option value="">in…</option>${ins.map(i=>`<option ${draft.hIn===String(i)?"selected":""}>${i}</option>`).join("")}</select>
+    <input class="tin" id="f_wlb" type="number" inputmode="numeric" placeholder="lbs" value="${esc(draft.wLb)}">
+   </div></div>
+  <div class="fgroup"><label class="f">Do any of these sound like you? <em>(tap all that apply)</em></label>
+   <div class="chips">
+    ${chip("symptoms","Loud snoring","😴 Loud snoring",1)}
+    ${chip("symptoms","Breathing pauses seen by someone else","😨 Breathing pauses (seen by someone)",1)}
+    ${chip("symptoms","Daytime sleepiness","🥱 Daytime sleepiness",1)}
+    ${chip("symptoms","Trouble concentrating","🧠 Trouble concentrating",1)}
+    ${chip("symptoms","Morning headaches","🤕 Morning headaches",1)}
+    ${chip("symptoms","Low mood","😔 Low mood",1)}
+    ${chip("symptoms","Trouble sleeping (insomnia)","🌙 Trouble sleeping (insomnia)",1)}
+    ${chip("symptoms","None of these","None of these",1)}
+   </div></div>
+  <div class="fgroup"><label class="f">Has a doctor told you that you have… <em>(tap all that apply)</em></label>
+   <div class="chips">
+    ${chip("conds","High blood pressure","High blood pressure",1)}
+    ${chip("conds","Heart disease (ischemic)","Heart disease",1)}
+    ${chip("conds","Stroke history","Past stroke",1)}
+    ${chip("conds","Heart failure","Heart failure",1)}
+    ${chip("conds","None of these","None of these",1)}
+   </div></div>
+  <div class="fgroup"><label class="f">Do you take opioid pain medication daily?</label>
+   <div class="chips">${chip("opioids","No","No")}${chip("opioids","Yes","Yes")}</div></div>
+  <div class="fgroup"><label class="f">Any of these in your recent history? <em>(they matter for CPAP safety)</em></label>
+   <div class="chips">
+    ${chip("safety","Facial surgery or major facial injury in the last 6 months","Facial surgery / injury (last 6 mo)",1)}
+    ${chip("safety","Collapsed lung (pneumothorax) recently","Recent collapsed lung",1)}
+    ${chip("safety","Spinal-fluid (CSF) leak or recent skull/brain surgery","CSF leak / skull surgery",1)}
+    ${chip("safety","Frequent severe nosebleeds","Frequent severe nosebleeds",1)}
+    ${chip("safety","None of these","None of these",1)}
+   </div></div>
+  <div class="fgroup"><label class="f">Medications & allergies <em>(optional)</em></label>
+   <textarea class="tin" id="f_meds" rows="2" placeholder="e.g. lisinopril; allergic to latex">${esc(draft.meds)}</textarea></div>
+ `);
+ bindText("f_wlb","wLb");bindText("f_meds","meds");
+ $("#f_hft").addEventListener("change",e=>{draft.hFt=e.target.value;saveDraft();});
+ $("#f_hin").addEventListener("change",e=>{draft.hIn=e.target.value;saveDraft();});
+}
+
+/* step 4 photo */
+function step4(){
+ wizChrome(4,`
+  <h2 class="q">One photo of your tongue</h2>
+  <p class="help">Your reviewing physician uses this to assess your airway — it’s the exam part of your visit.</p>
+  <div class="phototips">
+   <span>Face a window or bright light</span>
+   <span>Open wide, stick your tongue <b>all the way out</b>, say “ahh”</span>
+   <span>Hold the phone at eye level, slightly below your face</span>
+  </div>
+  <div id="camarea">
+   ${draft.photo?photoPreview():`
+   <div class="camwrap"><div class="guide"><div class="oval"></div></div>
+     <div style="color:#9FC4CC;font-size:14px;text-align:center;padding:20px">Camera preview appears here</div></div>
+   <div class="camctl"><button class="snap" onclick="openCam()">📷 Open front camera</button></div>
+   <div class="camctl">
+     <button class="chip" style="flex:1" onclick="$('#f_photo').click()">Upload a photo instead</button>
+     <button class="chip" style="flex:1" onclick="useSamplePhoto()">Use a sample (demo)</button>
+   </div>
+   <input type="file" id="f_photo" accept="image/*" capture="user" style="display:none">`}
+  </div>
+  <div class="whisper" style="margin-top:12px">🔒 Your photo is reviewed by the physician only. It is never analyzed by AI.</div>
+ `,"Continue");
+ const fp=$("#f_photo");if(fp)fp.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;downscale(f,720,.82,(url)=>{draft.photo=url;draft.photoKind="upload";saveDraft();render();});});
+}
+function photoPreview(){
+ return `<div class="camwrap">${draft.photoKind==="sample"?svgTongue(1):`<img class="shot" src="${draft.photo}">`}</div>
+ <div class="camctl"><button class="chip" style="flex:1" onclick="draft.photo=null;draft.photoKind=null;saveDraft();render()">↺ Retake</button>
+ <button class="snap" style="flex:2" onclick="wizNext(4)">Looks good — continue</button></div>`;
+}
+async function openCam(){
+ try{
+  cam=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280}},audio:false});
+  $("#camarea").innerHTML=`<div class="camwrap"><video id="camv" autoplay playsinline muted></video>
+   <div class="guide"><div class="oval"></div></div><div class="hinttxt">Tongue out — line your mouth up with the oval</div></div>
+   <div class="camctl"><button class="snap" onclick="snapPhoto()">⬤ Take photo</button></div>`;
+  $("#camv").srcObject=cam;
+ }catch(e){toast("Camera unavailable — you can upload a photo or use the sample.");}
+}
+function snapPhoto(){
+ const v=$("#camv");if(!v)return;
+ const cv=document.createElement("canvas");const sc=Math.min(1,720/Math.max(v.videoWidth,v.videoHeight));
+ cv.width=Math.round(v.videoWidth*sc);cv.height=Math.round(v.videoHeight*sc);
+ cv.getContext("2d").drawImage(v,0,0,cv.width,cv.height);
+ draft.photo=cv.toDataURL("image/jpeg",.82);draft.photoKind="camera";stopCam();saveDraft();render();
+}
+function useSamplePhoto(){draft.photo="svg1";draft.photoKind="sample";saveDraft();render();}
+
+/* step 5 review */
+function step5(){
+ const rows=(arr)=>arr.map(([k,v])=>`<div class="sumrow"><span class="k">${k}</span><span class="v">${v||"<span style='color:var(--bad)'>—</span>"}</span></div>`).join("");
+ wizChrome(5,`
+  <h2 class="q">Check your answers</h2>
+  <p class="help">Your physician sees exactly this.</p>
+  <div class="sumhead"><h3>ABOUT YOU</h3><button onclick="nav('#/apply/1')">Edit</button></div>
+  <div class="sumcard">${rows([["Name",esc(draft.first+" "+draft.last)],["Date of birth",esc(draft.dob)],["Sex",esc(draft.sex)],["State",esc(draft.state)],["Email",esc(draft.email)]])}</div>
+  <div class="sumhead"><h3>SLEEP STUDY</h3><button onclick="nav('#/apply/2')">Edit</button></div>
+  <div class="sumcard">${rows([["Type",esc(draft.sType)],["Date",draft.sYear?`${MONTHS[draft.sMonth]||""} ${draft.sYear}`:""],["AHI",esc(draft.ahi)],["Apnea type",esc(draft.pattern)],["Report",draft.report?esc(draft.report.name):"not attached"]])}</div>
+  <div class="sumhead"><h3>HEALTH</h3><button onclick="nav('#/apply/3')">Edit</button></div>
+  <div class="sumcard">${rows([["Symptoms",esc(draft.symptoms.join(", "))||"none selected"],["Conditions",esc(draft.conds.join(", "))||"none selected"],["Daily opioids",esc(draft.opioids)],["Safety flags",esc(draft.safety.filter(s=>s!=="None of these").join(", "))||"none"],["Airway photo",draft.photo?"✓ on file":""]])}</div>
+  <label class="consent" id="c1"><input type="checkbox" ${draft.cTele?"checked":""} onchange="draft.cTele=this.checked;saveDraft()"><span><b>Telehealth consent.</b> I agree to an asynchronous telehealth review: a licensed physician will review my information without a live visit, and may decline to prescribe or ask me for more information.</span></label>
+  <label class="consent" id="c2"><input type="checkbox" ${draft.cTruth?"checked":""} onchange="draft.cTruth=this.checked;saveDraft()"><span><b>My answers are true.</b> The information and photo I’m submitting are my own and accurate to the best of my knowledge.</span></label>
+ `);
+}
+
+/* step 6 pay */
+function step6(){
+ wizChrome(6,`
+  <h2 class="q">Payment</h2>
+  <p class="help">One flat fee. Refunded in full if the physician can’t issue your prescription.</p>
+  <div class="ordercard">
+   <div class="l1"><span>Physician review & prescription</span><span>$50.00</span></div>
+   <div class="l1"><span>Delivery to your email + any supplier</span><span>included</span></div>
+   <div class="tot"><span>Total</span><b>$50.00</b></div>
+   <div class="note">Full refund if no prescription is issued.</div>
+  </div>
+  <div class="paycard"><div class="demobadge">DEMO — NO CHARGE</div>
+   <div class="fgroup"><label class="f">Card number</label><input class="tin" disabled value="4242 4242 4242 4242"></div>
+   <div class="row2">
+    <div class="fgroup"><label class="f">Expiry</label><input class="tin" disabled value="12/28"></div>
+    <div class="fgroup"><label class="f">CVC</label><input class="tin" disabled value="•••"></div>
+   </div>
+   <div style="font-size:12px;color:var(--mut)">This is the test build — the payment step is simulated and no card is charged.</div>
+  </div>
+ `,"Pay $50 & submit");
+}
+
+/* validators */
+const validators={
+ 1:()=> !draft.first.trim()||!draft.last.trim()?"Please enter your name":!draft.dob?"Please enter your date of birth":(ageFromDOB(draft.dob)<18?"Orma Rx is for adults 18+":!draft.sex?"Please select sex at birth":!draft.state?"Please select your state":!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.email)?"Please enter a valid email":true),
+ 2:()=> !draft.sType?"Select your study type":draft.sMonth===null||!draft.sYear?"Select the study month and year":draft.ahi===""||isNaN(parseFloat(draft.ahi))?"Enter your AHI (it’s on your report)":!draft.dxed?"Tell us if you were told you have sleep apnea":!draft.pattern?"Select the apnea type (or “Not sure”)":true,
+ 3:()=> !draft.hFt||!draft.hIn||!draft.wLb?"Please enter height and weight":!draft.opioids?"Please answer the opioid question":(draft.symptoms.length===0?"Select your symptoms (or “None of these”)":(draft.conds.length===0?"Select your conditions (or “None of these”)":(draft.safety.length===0?"Answer the safety list (or “None of these”)":true))),
+ 4:()=> draft.photo?true:"The airway photo is required before physician review — take, upload, or use the sample",
+ 5:()=> !draft.cTele?"Please check the telehealth consent":!draft.cTruth?"Please confirm your answers are true":true,
+ 6:()=> true
+};
+function submitDraft(){
+ const sub={...draft,id:"u"+Date.now(),ts:Date.now(),sample:false};
+ const subs=store.subs;subs.push(sub);store.subs=subs;
+ store.draft=null;draft=blankDraft();
+ nav("#/done");
+}
+
+/* done */
+function vDone(){
+ app.innerHTML=`<div class="shell narrow view center">
+  <div class="bigcheck">✓</div>
+  <h2 class="q" style="font-size:24px">You’re all set</h2>
+  <p class="help" style="max-width:32ch;margin:6px auto 0">Your request is in the physician queue. Most reviews finish within 24 hours.</p>
+  <div class="stepscard nextsteps">
+   <div class="stepitem"><div class="n">1</div><div><b>Physician review</b><small>A licensed sleep physician checks your study, answers, and airway photo</small></div></div>
+   <div class="stepitem"><div class="n">2</div><div><b>Your prescription by email</b><small>Signed and ready to use — or a note if anything else is needed</small></div></div>
+   <div class="stepitem"><div class="n">3</div><div><b>Shop anywhere</b><small>Use it at the CPAP supplier of your choice</small></div></div>
+  </div>
+  <div class="demohint" style="text-align:left">🧪 <b>Demo:</b> you’re the physician too! Open the physician view to see your case pre-scored and sign it.</div>
+  <button class="cta" onclick="nav('#/doctor')">Open the physician view</button>
+  <button class="cta secondary" onclick="nav('#/')">Back to start</button>
+ </div>`;
+}
+
+/* ============ doctor ============ */
+function initials(c){return (c.first[0]||"")+(c.last[0]||"");}
+function agoStr(ts){const h=Math.round((Date.now()-ts)/36e5);if(h<1)return "just now";if(h<24)return h+"h ago";return Math.round(h/24)+"d ago";}
+function caseStatus(c){
+ return {s:store.signed[c.id]||((c.outcome&&c.outcome.type==="signed")?c.outcome:null),
+         d:store.declined[c.id]||((c.outcome&&c.outcome.type==="declined")?c.outcome:null)};
+}
+function vQueue(){
+ const pend=[],done=[];
+ allCases().forEach(c=>{const {s,d}=caseStatus(c);if(s||d)done.push({c,s,d});else pend.push(c);});
+ const card=(c,pill)=>`<div class="qcard" onclick="nav('#/doctor/${c.id}')">
+    <div class="avatar">${esc(initials(c))}</div>
+    <div class="mid"><div class="nm">${esc(c.first)} ${esc(c.last)} ${c.sample?"":'<span class="tagyou">YOUR TEST</span>'}</div>
+    <div class="meta">${ageFromDOB(c.dob)} ${c.sex?c.sex[0]:""} · AHI ${esc(c.ahi)} · ${esc(c.sType||"—")} · ${agoStr(c.ts)}</div></div>
+    ${pill}
+   </div>`;
+ app.innerHTML=`<div class="shell wide view">
+  <div class="dochead noprint">${oring(26)}<div class="wm">Orma Rx — Physician review<small>Pre-review ruleset v0.1 · every check shows its basis · you decide</small></div>
+   <div class="right"><button onclick="showRuleset()">Ruleset</button><button onclick="nav('#/')">Patient app</button></div></div>
+  <div class="learnnote">🧠 <b>It learns from you:</b> every decision you record here — a sign-off, a decline, a note, an override — teaches the pre-review how you read cases, so its green/red calls get more accurate over time.</div>
+  <div class="seclabel">In queue · ${pend.length}</div>
+  <div class="qlist">${pend.map(c=>{const v=evaluate(c);return card(c,`<span class="pill ${v.green?"ok":"bad"}">${v.green?"● Meets criteria":"● Review needed"}</span>`);}).join("")||'<div style="font-size:13px;color:var(--mut)">Queue is empty — submit a test case from the patient app.</div>'}</div>
+  <div class="seclabel">Completed <small>— worked examples: a clean sign-off, a decline with refund, a documented override</small></div>
+  <div class="qlist">${done.map(({c,s})=>card(c,s?`<span class="pill done">✓ Signed${s.override?" · override":""}</span>`:`<span class="pill decl">✕ Not prescribed</span>`)).join("")}</div>
+  <div style="font-size:12px;color:var(--mut);margin-top:14px">Automated pre-review orders the queue and shows its work — the prescribing decision is always the physician’s. Sample cases are fictional. <a href="javascript:resetDemo()">Restart demo</a></div>
+ </div>`;
+}
+function showRuleset(){
+ const o=document.createElement("div");o.className="overlay";o.onclick=e=>{if(e.target===o)o.remove();};
+ o.innerHTML=`<div class="modal"><h3>Pre-review ruleset v0.1 (draft — CMO to correct)</h3>
+  ${[["C1","Adult","age ≥ 18"],["C2","Identity & state","name, DOB, sex, state, contact complete"],["C3","Study documented","type + date + AHI/RDI on file"],["C4","Recency","study ≤ 5 years (payer note: some require ≤ 12 months)"],["C5","Severity","AHI ≥ 15, or 5–14.9 with ≥ 1 qualifier (EDS, cognition, mood, insomnia, HTN, ischemic heart disease, stroke)"],["C6","Obstructive predominance","not central-predominant; unknown + HF/opioids → physician eval"],["C7","Safety red flags","no recent facial surgery/trauma, CSF leak/skull surgery, pneumothorax, severe epistaxis"],["C8","Airway exam evidence","usable tongue/oropharynx photo — physician-viewed only, never machine-analyzed"],["C9","Consents","telehealth consent + truthfulness attestation"]].map(r=>`<div class="crit"><b>${r[0]} · ${r[1]}.</b> ${r[2]}</div>`).join("")}
+  <div style="font-size:12px;color:var(--mut);margin-top:10px">GREEN requires all nine. Physician may override in either direction with documentation. Ruleset lives with the reviewing physician — this draft is seeded from standard coverage/practice criteria for correction.</div>
+  <button class="close" onclick="this.closest('.overlay').remove()">Close</button></div>`;
+ document.body.appendChild(o);
+}
+function zoomImg(src,isSvg){
+ const o=document.createElement("div");o.className="overlay";o.onclick=()=>o.remove();
+ o.innerHTML=isSvg?`<div style="max-width:420px;width:100%">${src}</div>`:`<img src="${src}">`;
+ document.body.appendChild(o);
+}
+function photoHtml(c){
+ if(!c.photo)return `<div style="color:var(--mut);font-size:13px">No photo on file.</div>`;
+ if(c.photoKind==="sample"||String(c.photo).startsWith("svg")){const v=c.photo==="svg2"?2:c.photo==="svg3"?3:1;
+  return `<div onclick='zoomImg(${JSON.stringify(svgTongue(v))},true)' style="cursor:zoom-in">${svgTongue(v)}</div>`;}
+ return `<img class="thumb" src="${c.photo}" onclick="zoomImg('${c.photo}')">`;
+}
+function vCase(id){
+ const c=getCase(id);if(!c)return nav("#/doctor");
+ const v=evaluate(c);const b=bmi(c);
+ const {s,d}=caseStatus(c);
+ const fails=v.checks.filter(x=>!x.pass);
+ const action=s
+  ?`<div class="signedbanner"><span>✓ Signed by ${esc(s.name)} · ${new Date(s.ts).toLocaleString()}</span><a href="#/rx/${id}">View prescription →</a></div>`
+   +(s.override?`<div class="dcard"><h3>Override rationale (documented)</h3><div style="font-size:13.5px;line-height:1.6">${esc(s.rationale||"")}</div><div style="font-size:12px;color:var(--mut);margin-top:8px">Override logged — corrections like this tune the pre-review for future cases.</div></div>`:"")
+  :d
+  ?`<div class="signedbanner decl"><span>✕ Not prescribed — note sent & $50 refunded${d.name?" · "+esc(d.name):""} · ${new Date(d.ts).toLocaleDateString()}</span></div>
+    <div class="dcard"><h3>Note sent to patient</h3><div style="font-size:13.5px;line-height:1.6;white-space:pre-wrap">${esc(d.note||"")}</div></div>`
+  :v.green?signBox(id,c,false):redActions(id,c,fails);
+ app.innerHTML=`<div class="shell wide view">
+  <div class="dochead noprint"><button class="docback" onclick="nav('#/doctor')" aria-label="Back to patient list">‹</button>${oring(26)}<div class="wm">${esc(c.first)} ${esc(c.last)}<small>${ageFromDOB(c.dob)}-year-old ${esc((c.sex||"").toLowerCase())} · ${esc(c.state)} · submitted ${agoStr(c.ts)}</small></div>
+   <div class="right"><button onclick="nav('#/doctor')">‹ Patient list</button></div></div>
+  <div class="casegrid">
+  <div class="colmain">
+  <div class="verdict ${v.green?"ok":"bad"}">
+   <div class="big">${v.green?"✅ Meets CPAP prescription criteria":"⚠️ Does not meet criteria"}<span class="cnt">${v.passed}/${v.total}</span></div>
+   <div class="sub">${v.green?"All checks passed — review the evidence below and sign.":fails.length+" check"+(fails.length>1?"s":"")+" failed: "+fails.map(f=>f.label).join(" · ")}</div>
+  </div>
+
+  <div class="aisum"><h3>AI pre-review summary</h3>${esc(aiSummary(c,v))}
+   <div class="foot">Automated pre-review against ruleset v0.1 (<a href="javascript:showRuleset()">view</a>). It checks completeness and criteria only — the prescribing decision is yours. The airway photo is never machine-analyzed.</div></div>
+
+  <div class="checks">${v.checks.map(k=>`<div class="checkrow"><div class="ic ${k.pass?"ok":"bad"}">${k.pass?"✓":"✕"}</div><div><b>${k.label}</b><small>${k.evidence}</small></div></div>`).join("")}</div>
+  </div>
+
+  <div class="colside">
+  <div class="row2" style="align-items:start">
+   <div class="dcard"><h3>Airway photo</h3>${photoHtml(c)}</div>
+   <div class="dcard"><h3>Sleep study</h3>
+    <div style="font-size:14px;line-height:1.7">${esc(c.sType)}<br>${MONTHS[c.sMonth]||""} ${c.sYear||""} · AHI <b>${esc(c.ahi)}</b><br>Pattern: ${esc(c.pattern||"—")}<br>
+    ${c.report?`📄 ${esc(c.report.name)}${c.report.kind==="img"&&c.report.thumb?`<br><img class="thumb" style="margin-top:8px" src="${c.report.thumb}" onclick="zoomImg('${c.report.thumb}')">`:""}`:"<span style='color:var(--mut)'>No report file attached</span>"}</div></div>
+  </div>
+
+  <details class="intake"><summary>Full intake — every answer</summary><div class="body">
+   ${[["DOB",c.dob],["Email",c.email],["Phone",c.phone||"—"],["Height",c.hFt&&c.hIn?c.hFt+"′"+c.hIn+"″":"—"],["Weight",c.wLb?c.wLb+" lb":"—"],["BMI",b||"—"],["Symptoms",c.symptoms.join(", ")||"none"],["Conditions",c.conds.join(", ")||"none"],["Daily opioids",c.opioids||"—"],["Safety flags",(c.safety||[]).filter(x=>x!=="None of these").join("; ")||"none"],["Meds / allergies",c.meds||"—"],["Told has sleep apnea",c.dxed||"—"],["Telehealth consent",c.cTele?"✓":"✗"],["Truthfulness attestation",c.cTruth?"✓":"✗"]].map(r=>`<div class="sumrow"><span class="k">${esc(r[0])}</span><span class="v">${esc(String(r[1]))}</span></div>`).join("")}
+  </div></details>
+  </div>
+
+  <div class="actionarea">${action}
+  <button class="ghostbtn noprint" onclick="nav('#/doctor')">‹ Back to patient list</button></div>
+  </div>
+ </div>`;
+}
+function rxDefaults(c){return {device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",humid:"Heated humidifier",supplies:"Mask and headgear of patient’s choice with fitting; tubing and filters; replacement supplies per standard schedule",dx:"G47.33 — Obstructive sleep apnea",lon:"99 months (lifetime need)"};}
+function signBox(id,c,isOverride){
+ const rx=rxDefaults(c);
+ return `<div class="signbox" id="signbox">
+  <h3>${isOverride?"Sign with documented rationale":"Prescription — review & sign"}</h3>
+  ${isOverride?`<div class="fgroup"><label class="f">Clinical rationale (required)</label><textarea class="tin" id="ovr" rows="2" placeholder="Why prescribing despite failed checks…"></textarea></div>`:""}
+  <div class="rxprev" id="rxprev"><b>Rx:</b> <span id="rxdevice">${rx.device}</span>, <span id="rxpressure">${rx.pressure}</span> · ${rx.humid} · ${rx.supplies}<br><b>Dx:</b> ${rx.dx} · <b>Length of need:</b> ${rx.lon}</div>
+  <div class="row2">
+   <button class="chip" onclick="setRx('APAP (auto-adjusting positive airway pressure)','4–20 cm H₂O',this)">APAP 4–20</button>
+   <button class="chip" onclick="setRx('CPAP (fixed pressure)','10 cm H₂O',this)">Fixed CPAP 10</button>
+  </div>
+  <div class="fgroup" style="margin-top:12px"><label class="consent" style="margin:0"><input type="checkbox" id="att" onchange="$('#dosign').disabled=!(this.checked&&$('#signname').value.trim())"><span>I have reviewed the intake, sleep-study details, and airway photo, and I am licensed in the patient’s state.</span></label></div>
+  <div class="fgroup"><label class="f">Type your full name to sign</label><input class="tin" id="signname" placeholder="Dr. …" oninput="$('#dosign').disabled=!(this.value.trim()&&$('#att').checked)"></div>
+  <button class="signbtn" id="dosign" disabled onclick="doSign('${id}',${isOverride?1:0})">✍️ Sign & issue prescription</button>
+ </div>`;
+}
+function setRx(dev,pres,btn){$("#rxdevice").textContent=dev;$("#rxpressure").textContent=pres;btn.closest(".row2").querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));btn.classList.add("on");}
+function redActions(id,c,fails){
+ const note="Thank you for your Orma Rx request. I can’t issue a CPAP prescription yet because:\n"+fails.map(f=>"• "+f.label+" — "+f.evidence.replace(/<[^>]+>/g,"")).join("\n")+"\n\nYour $50 has been refunded in full. What to do next: please discuss these findings with a physician — in many cases an in-person or video evaluation resolves them.";
+ return `<div class="dcard" id="redactions"><h3>Decision</h3>
+  <div class="fgroup"><label class="f">Note to patient (prefilled from the failed checks — edit freely)</label>
+  <textarea class="tin" id="declinenote" rows="7">${esc(note)}</textarea></div>
+  <button class="declinebtn" onclick="doDecline('${id}')">Send note & refund $50 (demo)</button>
+  <button class="ghostbtn" onclick="overrideSign('${id}')">Sign anyway — document clinical rationale</button>
+ </div>`;
+}
+function doDecline(id){
+ const note=$("#declinenote")?$("#declinenote").value.trim():"";
+ const d=store.declined;d[id]={ts:Date.now(),note};store.declined=d;
+ toast("Demo: note sent to patient + $50 refund issued");nav("#/doctor");
+}
+function overrideSign(id){const c=getCase(id);const el=$("#redactions");if(el&&c)el.outerHTML=signBox(id,c,true);}
+function doSign(id,isOverride){
+ const name=$("#signname").value.trim();if(!name)return;
+ if(isOverride){const r=$("#ovr");if(r&&!r.value.trim()){toast("Rationale required to sign a red case");return;}}
+ const signed=store.signed;
+ signed[id]={name,ts:Date.now(),device:$("#rxdevice").textContent,pressure:$("#rxpressure").textContent,override:!!isOverride,rationale:isOverride&&$("#ovr")?$("#ovr").value.trim():""};
+ store.signed=signed;toast("Prescription signed");nav("#/rx/"+id);
+}
+
+/* rx doc */
+function vRx(id){
+ const c=getCase(id);const s=c?caseStatus(c).s:null;if(!c||!s)return nav("#/doctor");
+ const rx=rxDefaults(c);
+ app.innerHTML=`<div class="shell narrow view">
+  <div class="noprint" style="display:flex;gap:10px;margin-bottom:14px">
+   <button class="backbtn" onclick="nav('#/doctor/${id}')">‹</button>
+   <button class="cta" style="margin:0;flex:1" onclick="window.print()">🖨 Print / save as PDF</button>
+  </div>
+  <div class="rxsheet">
+   <div class="watermark"><span>SPECIMEN · TEST BUILD</span></div>
+   <div class="lh">${oring(34)}<div class="t">Orma Rx<small>Prescription — Positive Airway Pressure Therapy · ${new Date(s.ts).toLocaleDateString()}</small></div></div>
+   <div class="blk"><h4>Patient</h4>${esc(c.first)} ${esc(c.last)} · DOB ${esc(c.dob)} · ${esc(c.state)}</div>
+   <div class="blk"><h4>Diagnosis</h4>${rx.dx}</div>
+   <div class="blk"><h4>Prescription</h4><div class="rxbody">
+    <b>${esc(s.device)}</b>, pressure ${esc(s.pressure)}<br>${rx.humid}<br>${rx.supplies}<br>Length of need: ${rx.lon} · Valid at the supplier of patient’s choice
+   </div></div>
+   ${s.override?`<div class="blk"><h4>Clinical rationale (override)</h4>${esc(s.rationale)}</div>`:""}
+   <div class="sig"><div><div class="name">${esc(s.name)}</div><small>Reviewing physician · License on file (demo) · Signed electronically ${new Date(s.ts).toLocaleString()}</small></div></div>
+  </div>
+  <div class="noprint" style="font-size:12px;color:var(--mut);margin-top:12px;text-align:center">Test build — this specimen is not a valid prescription.</div>
+ </div>`;
+}
+
+/* wizard dispatch */
+function vWizard(step){switch(step){case 1:step1();break;case 2:step2();break;case 3:step3();break;case 4:step4();break;case 5:step5();break;case 6:step6();break;default:step1();}}
+
+render();
+</script>
+</body>
+</html>
