@@ -229,6 +229,12 @@ details.intake .body{padding:0 16px 12px}
   .shell{padding:0;max-width:none}
   .rxsheet{border:0;box-shadow:none}
 }
+/* report scan + extraction tags */
+.frtag{font-style:normal;color:var(--ok);background:var(--okbg);font-weight:600;font-size:10.5px;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:1px}
+.scanbox{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px 20px;min-height:220px}
+.scanline{opacity:0;animation:fadeUp .4s ease forwards;font-size:14.5px;padding:7px 0}
+.scanline:first-child{font-weight:600;color:var(--teal)}
+
 /* queue sections + completed examples */
 .learnnote{background:#F2FAFB;border:1px solid #D5ECEF;border-radius:14px;padding:12px 14px;font-size:13px;color:var(--ink);margin-bottom:14px;line-height:1.5}
 .seclabel{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.06em;text-transform:uppercase;margin:18px 0 8px}
@@ -309,8 +315,8 @@ const store={
   get draft(){try{return JSON.parse(localStorage.getItem("ormaRxDraft")||"null");}catch(e){return null;}},
   set draft(v){localStorage.setItem("ormaRxDraft",JSON.stringify(v));}
 };
-function blankDraft(){return {first:"",last:"",dob:"",sex:"",state:"",email:"",phone:"",
- sType:"",sMonth:null,sYear:null,ahi:"",dxed:"",pattern:"",report:null,
+function blankDraft(){return {first:"",last:"",dob:"",sex:"",state:"",email:"",phone:"",address:"",
+ sType:"",sMonth:null,sYear:null,ahi:"",dxed:"",pattern:"",report:null,extracted:null,
  hFt:"",hIn:"",wLb:"",symptoms:[],conds:[],opioids:"",safety:[],meds:"",
  photo:null,photoKind:null,cTele:false,cTruth:false};}
 let draft=store.draft||blankDraft();
@@ -426,8 +432,8 @@ function vLanding(){
    <div class="fine">For adults 18+ who already have sleep-study results. Orma Rx does not diagnose sleep apnea. If the physician can’t issue your prescription, you get a full refund.</div>
   </div>
   <div class="stepscard">
-   <div class="stepitem"><div class="n">1</div><div><b>Your sleep study</b><small>Type, date, and your AHI — from any lab or home test</small></div></div>
-   <div class="stepitem"><div class="n">2</div><div><b>Quick health questions + one photo</b><small>5 minutes, on your phone — includes a photo of your tongue for the physician’s airway exam</small></div></div>
+   <div class="stepitem"><div class="n">1</div><div><b>Upload your sleep study</b><small>We read your name, date of birth, AHI and more right off the report — barely any typing</small></div></div>
+   <div class="stepitem"><div class="n">2</div><div><b>Confirm + a few taps + one photo</b><small>Check what we found, answer what’s not on the report, snap a tongue photo for the airway exam</small></div></div>
    <div class="stepitem"><div class="n">3</div><div><b>Physician review & prescription</b><small>A licensed sleep physician reviews and, if appropriate, signs. Use it at any CPAP supplier.</small></div></div>
   </div>
   <div class="trust"><span>Reviewed by licensed sleep physicians</span><span>Valid at the supplier of your choice</span><span>Full refund if not prescribed</span></div>
@@ -450,13 +456,13 @@ function startApply(){draft=store.draft||blankDraft();nav("#/apply/1");}
 function resetDemo(){localStorage.removeItem("ormaRxSubs");localStorage.removeItem("ormaRxSigned");localStorage.removeItem("ormaRxDeclined");localStorage.removeItem("ormaRxDraft");draft=blankDraft();toast("Demo reset");nav("#/");render();}
 
 /* ============ wizard ============ */
-const STEPS=["Basics","Sleep study","Health","Photo","Review","Payment"];
+const STEPS=["Report","Confirm","Health","Photo","Pay"];
 function wizChrome(step,inner,nextLabel){
  app.innerHTML=`<div class="shell narrow view">
   <div class="wiztop">
    <button class="backbtn" onclick="wizBack(${step})">‹</button>
-   <div class="prog"><div class="lbl"><span>${STEPS[step-1]}</span><span>Step ${step} of 6 · ~5 min</span></div>
-   <div class="bar"><div class="fill" style="width:${Math.round(step/6*100)}%"></div></div></div>
+   <div class="prog"><div class="lbl"><span>${STEPS[step-1]}</span><span>Step ${step} of 5 · under 5 min</span></div>
+   <div class="bar"><div class="fill" style="width:${Math.round(step/5*100)}%"></div></div></div>
   </div>
   <div id="stepbody">${inner}</div>
  </div>
@@ -467,7 +473,7 @@ function wizNext(step){
  const v=validators[step]();
  if(v!==true){toast(v);return;}
  saveDraft();
- if(step>=6){submitDraft();}else nav("#/apply/"+(step+1));
+ if(step>=5){submitDraft();}else nav("#/apply/"+(step+1));
 }
 function chip(field,val,label,multi,sub){
  const on=multi?(draft[field]||[]).includes(val):draft[field]===val;
@@ -482,82 +488,104 @@ function chipTap(field,val,multi,rerenderStep){
 }
 function bindText(id,field){const el=$("#"+id);if(!el)return;el.addEventListener("input",()=>{draft[field]=el.value;saveDraft();});}
 
-/* step 1 basics */
+/* step 1 report — upload first, we read it */
 function step1(){
  wizChrome(1,`
-  <h2 class="q">Let’s start with you</h2>
-  <p class="help">This goes on your prescription, so make it match your ID.</p>
-  <div class="row2">
-   <div class="fgroup"><label class="f">First name</label><input class="tin" id="f_first" value="${esc(draft.first)}" autocomplete="given-name"></div>
-   <div class="fgroup"><label class="f">Last name</label><input class="tin" id="f_last" value="${esc(draft.last)}" autocomplete="family-name"></div>
+  <h2 class="q">Start with your sleep study report</h2>
+  <p class="help">We read your details straight from it — less typing, fewer mistakes.</p>
+  <div id="repzone">
+  ${draft.report?`<div class="filechip">${draft.report.kind==="img"&&draft.report.thumb?`<img src="${draft.report.thumb}">`:"📄"} <span>${esc(draft.report.name)}</span><button class="x" onclick="clearReport()">✕</button></div>
+   <div class="whisper" style="margin-top:10px">Report on file — tap Continue, or ✕ to replace it.</div>`
+  :`<button class="uploadbox" style="padding:24px 14px" onclick="$('#f_report').click()"><b>📄 Upload your report</b><br><span style="font-size:12.5px;color:var(--mut)">PDF or a clear photo — any lab or home test counts</span></button>
+   <input type="file" id="f_report" accept="image/*,.pdf" style="display:none">
+   <div style="text-align:center;color:var(--mut);font-size:12px;margin:12px 0">— or —</div>
+   <button class="chip big" style="width:100%" onclick="useSampleReport()">🧪 Use the sample report (demo)<small>Watch the auto-read fill everything for a fictional patient</small></button>`}
   </div>
-  <div class="row2">
-   <div class="fgroup"><label class="f">Date of birth</label><input class="tin" id="f_dob" type="date" value="${esc(draft.dob)}" max="${NOW.toISOString().slice(0,10)}"></div>
-   <div class="fgroup"><label class="f">State</label><select class="tin" id="f_state"><option value="">Select…</option>${STATES.map(s=>`<option ${draft.state===s?"selected":""}>${s}</option>`).join("")}</select></div>
-  </div>
-  <div class="fgroup"><label class="f">Sex at birth <em>(used for your clinical review)</em></label>
-   <div class="chips">${chip("sex","Female","Female")}${chip("sex","Male","Male")}${chip("sex","Other","Other")}</div></div>
-  <div class="fgroup"><label class="f">Email <em>(your prescription is delivered here)</em></label><input class="tin" id="f_email" type="email" inputmode="email" value="${esc(draft.email)}" autocomplete="email"></div>
-  <div class="fgroup"><label class="f">Mobile phone <em>(optional)</em></label><input class="tin" id="f_phone" type="tel" inputmode="tel" value="${esc(draft.phone)}" autocomplete="tel"></div>
+  <div class="whisper" style="margin-top:12px">We look for your name, date of birth, address, study type & date, AHI, and height & weight. You confirm everything on the next screen — nothing is submitted yet.</div>
  `);
- bindText("f_first","first");bindText("f_last","last");bindText("f_email","email");bindText("f_phone","phone");
- $("#f_dob").addEventListener("change",e=>{draft.dob=e.target.value;saveDraft();});
- $("#f_state").addEventListener("change",e=>{draft.state=e.target.value;saveDraft();});
+ const fr=$("#f_report");if(fr)fr.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+  if(f.type==="application/pdf"){draft.report={name:f.name,kind:"pdf"};draft.extracted=null;saveDraft();runScan(false);}
+  else{downscale(f,1000,.8,(url)=>{draft.report={name:f.name,kind:"img",thumb:url};draft.extracted=null;saveDraft();runScan(false);});}});
+}
+function clearReport(){draft.report=null;draft.extracted=null;saveDraft();render();}
+function useSampleReport(){
+ Object.assign(draft,{report:{name:"HST_report_sample.pdf",kind:"pdf"},first:"Dana",last:"Whitmore",dob:"1975-08-23",sex:"Female",address:"2214 Hawthorne Ave, Sacramento",state:"CA",sType:"Home sleep test",sMonth:4,sYear:2026,ahi:"19.6",dxed:"Yes",pattern:"Mostly obstructive",hFt:"5",hIn:"6",wLb:"172",
+  extracted:{first:1,last:1,dob:1,sex:1,address:1,state:1,sType:1,sDate:1,ahi:1,pattern:1,dxed:1,hw:1}});
+ saveDraft();runScan(true);
+}
+function runScan(rich){
+ const lines=rich?["Scanning your report…","✓ Name & date of birth","✓ Address","✓ Study type, date & AHI","✓ Height & weight","All set — check it over next"]
+  :["Scanning your report…","🧪 Test build: auto-read runs on the sample report only","Your file is saved for the physician — enter your details next"];
+ const nb=$("#nextbtn");if(nb)nb.style.display="none";
+ const sb=$("#stepbody");if(!sb)return;
+ sb.innerHTML=`<div class="scanbox">${lines.map((l,i)=>`<div class="scanline" style="animation-delay:${i*.42}s">${l}</div>`).join("")}</div>`;
+ setTimeout(()=>{if((location.hash||"#/")==="#/apply/1")nav("#/apply/2");},rich?2900:2100);
 }
 
-/* step 2 study */
+/* step 2 confirm what we read */
 function step2(){
  const years=[];for(let y=NOW.getFullYear();y>=2016;y--)years.push(y);
+ const x=draft.extracted;
+ const tag=k=>x&&x[k]?`<em class="frtag">✓ report</em>`:"";
  wizChrome(2,`
-  <h2 class="q">Your sleep study</h2>
-  <p class="help">Any lab or home test counts. Grab your report if you have it.</p>
-  <div class="fgroup"><label class="f">What kind of study?</label>
-   ${chip("sType","In-lab sleep study","In-lab sleep study",0,"Overnight in a sleep center (polysomnography)",2)}
-   <div style="height:8px"></div>
-   ${chip("sType","Home sleep test","Home sleep test",0,"A take-home kit you wore for a night",2)}
+  <h2 class="q">${x?"Check what we read":"Your details"}</h2>
+  <p class="help">${x?"Prefilled from your report — fix anything that’s off. The name goes on your prescription, so make it match your ID.":"The test build only auto-reads the sample report, so fill these in. Your file is still attached for the physician."}</p>
+  ${draft.report?`<div class="filechip" style="margin-bottom:14px">📄 <span>${esc(draft.report.name)}</span><button class="x" onclick="clearReport();nav('#/apply/1')">✕</button></div>`:""}
+  <div class="row2">
+   <div class="fgroup"><label class="f">First name${tag("first")}</label><input class="tin" id="f_first" value="${esc(draft.first)}" autocomplete="given-name"></div>
+   <div class="fgroup"><label class="f">Last name${tag("last")}</label><input class="tin" id="f_last" value="${esc(draft.last)}" autocomplete="family-name"></div>
   </div>
-  <div class="fgroup"><label class="f">When was it?</label>
+  <div class="row2">
+   <div class="fgroup"><label class="f">Date of birth${tag("dob")}</label><input class="tin" id="f_dob" type="date" value="${esc(draft.dob)}" max="${NOW.toISOString().slice(0,10)}"></div>
+   <div class="fgroup"><label class="f">Sex at birth${tag("sex")}</label><select class="tin" id="f_sex"><option value="">Select…</option>${["Female","Male","Other"].map(s=>`<option ${draft.sex===s?"selected":""}>${s}</option>`).join("")}</select></div>
+  </div>
+  <div class="fgroup"><label class="f">Address <em>(optional)</em>${tag("address")}</label><input class="tin" id="f_address" value="${esc(draft.address||"")}" autocomplete="street-address"></div>
+  <div class="row2">
+   <div class="fgroup"><label class="f">State${tag("state")}</label><select class="tin" id="f_state"><option value="">Select…</option>${STATES.map(s=>`<option ${draft.state===s?"selected":""}>${s}</option>`).join("")}</select></div>
+   <div class="fgroup"><label class="f">AHI <em>(events/hr)</em>${tag("ahi")}</label><input class="tin" id="f_ahi" type="number" step="0.1" min="0" max="150" inputmode="decimal" placeholder="e.g. 18.5" value="${esc(draft.ahi)}"></div>
+  </div>
+  <div class="fgroup"><label class="f">When was the study?${tag("sDate")}</label>
    <div class="row2">
     <select class="tin" id="f_smonth"><option value="">Month…</option>${MONTHS.map((m,i)=>`<option value="${i}" ${draft.sMonth===i?"selected":""}>${m}</option>`).join("")}</select>
     <select class="tin" id="f_syear"><option value="">Year…</option>${years.map(y=>`<option ${draft.sYear===y?"selected":""}>${y}</option>`).join("")}</select>
    </div></div>
-  <div class="fgroup"><label class="f">Your AHI <em>(events per hour)</em></label>
-   <input class="tin" id="f_ahi" type="number" step="0.1" min="0" max="150" inputmode="decimal" placeholder="e.g. 18.5" value="${esc(draft.ahi)}">
-   <div class="whisper">📄 On your report, look for <b>“AHI”</b> (or “RDI”) — usually on the first page, as events per hour.</div></div>
-  <div class="fgroup"><label class="f">Were you told you have sleep apnea?</label>
+  <div class="fgroup"><label class="f">Study type${tag("sType")}</label>
+   <div class="chips">${chip("sType","In-lab sleep study","In-lab study")}${chip("sType","Home sleep test","Home sleep test")}</div></div>
+  <div class="fgroup"><label class="f">The report says events were…${tag("pattern")}</label>
+   <div class="chips">${chip("pattern","Mostly obstructive","Mostly obstructive")}${chip("pattern","Mostly central","Mostly central")}${chip("pattern","Not sure","Not sure")}</div></div>
+  <div class="fgroup"><label class="f">Were you told you have sleep apnea?${tag("dxed")}</label>
    <div class="chips">${chip("dxed","Yes","Yes")}${chip("dxed","Not sure","Not sure")}</div></div>
-  <div class="fgroup"><label class="f">Did the report say the events were…</label>
-   <div class="chips">${chip("pattern","Mostly obstructive","Mostly obstructive")}${chip("pattern","Mostly central","Mostly central")}${chip("pattern","Not sure","Not sure")}</div>
-   <div class="whisper">Most sleep apnea is <b>obstructive</b>. “Central” appears on the report as central apneas — if unsure, pick “Not sure”.</div></div>
-  <div class="fgroup"><label class="f">Attach your report <em>(recommended — speeds review)</em></label>
-   ${draft.report?`<div class="filechip">${draft.report.kind==="img"&&draft.report.thumb?`<img src="${draft.report.thumb}">`:"📄"} <span>${esc(draft.report.name)}</span><button class="x" onclick="draft.report=null;saveDraft();render()">✕</button></div>`
-   :`<button class="uploadbox" onclick="$('#f_report').click()">📎 Tap to attach a photo or PDF of your report</button><input type="file" id="f_report" accept="image/*,.pdf" style="display:none">`}
-  </div>
+  <div class="fgroup"><label class="f">Height & weight${tag("hw")}</label>
+   <div class="row3">
+    <select class="tin" id="f_hft"><option value="">ft…</option>${["4","5","6","7"].map(f=>`<option ${draft.hFt===f?"selected":""}>${f}</option>`).join("")}</select>
+    <select class="tin" id="f_hin"><option value="">in…</option>${[...Array(12).keys()].map(i=>`<option ${draft.hIn===String(i)?"selected":""}>${i}</option>`).join("")}</select>
+    <input class="tin" id="f_wlb" type="number" inputmode="numeric" placeholder="lbs" value="${esc(draft.wLb)}">
+   </div></div>
+  ${x?`<div class="whisper">Read something wrong? Tap the field and correct it — your corrections win.</div>`:""}
  `);
- bindText("f_ahi","ahi");
- const ms=$("#f_smonth");if(ms)ms.addEventListener("change",e=>{draft.sMonth=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
- const ys=$("#f_syear");if(ys)ys.addEventListener("change",e=>{draft.sYear=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
- const fr=$("#f_report");if(fr)fr.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
-   if(f.type==="application/pdf"){draft.report={name:f.name,kind:"pdf"};saveDraft();render();}
-   else{downscale(f,1000,.8,(url)=>{draft.report={name:f.name,kind:"img",thumb:url};saveDraft();render();});}});
+ bindText("f_first","first");bindText("f_last","last");bindText("f_address","address");bindText("f_ahi","ahi");bindText("f_wlb","wLb");
+ $("#f_dob").addEventListener("change",e=>{draft.dob=e.target.value;saveDraft();});
+ $("#f_sex").addEventListener("change",e=>{draft.sex=e.target.value;saveDraft();});
+ $("#f_state").addEventListener("change",e=>{draft.state=e.target.value;saveDraft();});
+ $("#f_smonth").addEventListener("change",e=>{draft.sMonth=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
+ $("#f_syear").addEventListener("change",e=>{draft.sYear=e.target.value===""?null:parseInt(e.target.value);saveDraft();});
+ $("#f_hft").addEventListener("change",e=>{draft.hFt=e.target.value;saveDraft();});
+ $("#f_hin").addEventListener("change",e=>{draft.hIn=e.target.value;saveDraft();});
 }
 function downscale(file,maxDim,q,cb){const img=new Image();img.onload=()=>{const sc=Math.min(1,maxDim/Math.max(img.width,img.height));
  const cv=document.createElement("canvas");cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);
  cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL("image/jpeg",q));URL.revokeObjectURL(img.src);};
  img.src=URL.createObjectURL(file);}
 
-/* step 3 health */
+/* step 3 things not on the report */
 function step3(){
- const fts=["4","5","6","7"],ins=[...Array(12).keys()];
  wizChrome(3,`
-  <h2 class="q">A few health questions</h2>
-  <p class="help">These are the same questions a sleep clinic would ask.</p>
-  <div class="fgroup"><label class="f">Height & weight</label>
-   <div class="row3">
-    <select class="tin" id="f_hft"><option value="">ft…</option>${fts.map(f=>`<option ${draft.hFt===f?"selected":""}>${f}</option>`).join("")}</select>
-    <select class="tin" id="f_hin"><option value="">in…</option>${ins.map(i=>`<option ${draft.hIn===String(i)?"selected":""}>${i}</option>`).join("")}</select>
-    <input class="tin" id="f_wlb" type="number" inputmode="numeric" placeholder="lbs" value="${esc(draft.wLb)}">
-   </div></div>
+  <h2 class="q">A few things not on your report</h2>
+  <p class="help">Same questions a sleep clinic would ask — mostly quick taps.</p>
+  <div class="row2">
+   <div class="fgroup"><label class="f">Email <em>(prescription goes here)</em></label><input class="tin" id="f_email" type="email" inputmode="email" value="${esc(draft.email)}" autocomplete="email"></div>
+   <div class="fgroup"><label class="f">Mobile <em>(optional)</em></label><input class="tin" id="f_phone" type="tel" inputmode="tel" value="${esc(draft.phone)}" autocomplete="tel"></div>
+  </div>
   <div class="fgroup"><label class="f">Do any of these sound like you? <em>(tap all that apply)</em></label>
    <div class="chips">
     ${chip("symptoms","Loud snoring","😴 Loud snoring",1)}
@@ -590,9 +618,7 @@ function step3(){
   <div class="fgroup"><label class="f">Medications & allergies <em>(optional)</em></label>
    <textarea class="tin" id="f_meds" rows="2" placeholder="e.g. lisinopril; allergic to latex">${esc(draft.meds)}</textarea></div>
  `);
- bindText("f_wlb","wLb");bindText("f_meds","meds");
- $("#f_hft").addEventListener("change",e=>{draft.hFt=e.target.value;saveDraft();});
- $("#f_hin").addEventListener("change",e=>{draft.hIn=e.target.value;saveDraft();});
+ bindText("f_email","email");bindText("f_phone","phone");bindText("f_meds","meds");
 }
 
 /* step 4 photo */
@@ -643,28 +669,20 @@ function snapPhoto(){
 }
 function useSamplePhoto(){draft.photo="svg1";draft.photoKind="sample";saveDraft();render();}
 
-/* step 5 review */
+/* step 5 check & pay */
 function step5(){
  const rows=(arr)=>arr.map(([k,v])=>`<div class="sumrow"><span class="k">${k}</span><span class="v">${v||"<span style='color:var(--bad)'>—</span>"}</span></div>`).join("");
  wizChrome(5,`
-  <h2 class="q">Check your answers</h2>
-  <p class="help">Your physician sees exactly this.</p>
-  <div class="sumhead"><h3>ABOUT YOU</h3><button onclick="nav('#/apply/1')">Edit</button></div>
-  <div class="sumcard">${rows([["Name",esc(draft.first+" "+draft.last)],["Date of birth",esc(draft.dob)],["Sex",esc(draft.sex)],["State",esc(draft.state)],["Email",esc(draft.email)]])}</div>
+  <h2 class="q">Check & pay</h2>
+  <p class="help">Your physician sees exactly this. One flat fee — refunded in full if no prescription is issued.</p>
+  <div class="sumhead"><h3>ABOUT YOU</h3><button onclick="nav('#/apply/2')">Edit</button></div>
+  <div class="sumcard">${rows([["Name",esc(draft.first+" "+draft.last)],["Date of birth",esc(draft.dob)],["Sex",esc(draft.sex)],["Address",esc([draft.address,draft.state].filter(Boolean).join(", "))],["Email",esc(draft.email)]])}</div>
   <div class="sumhead"><h3>SLEEP STUDY</h3><button onclick="nav('#/apply/2')">Edit</button></div>
   <div class="sumcard">${rows([["Type",esc(draft.sType)],["Date",draft.sYear?`${MONTHS[draft.sMonth]||""} ${draft.sYear}`:""],["AHI",esc(draft.ahi)],["Apnea type",esc(draft.pattern)],["Report",draft.report?esc(draft.report.name):"not attached"]])}</div>
-  <div class="sumhead"><h3>HEALTH</h3><button onclick="nav('#/apply/3')">Edit</button></div>
+  <div class="sumhead"><h3>HEALTH & PHOTO</h3><button onclick="nav('#/apply/3')">Edit</button></div>
   <div class="sumcard">${rows([["Symptoms",esc(draft.symptoms.join(", "))||"none selected"],["Conditions",esc(draft.conds.join(", "))||"none selected"],["Daily opioids",esc(draft.opioids)],["Safety flags",esc(draft.safety.filter(s=>s!=="None of these").join(", "))||"none"],["Airway photo",draft.photo?"✓ on file":""]])}</div>
   <label class="consent" id="c1"><input type="checkbox" ${draft.cTele?"checked":""} onchange="draft.cTele=this.checked;saveDraft()"><span><b>Telehealth consent.</b> I agree to an asynchronous telehealth review: a licensed physician will review my information without a live visit, and may decline to prescribe or ask me for more information.</span></label>
   <label class="consent" id="c2"><input type="checkbox" ${draft.cTruth?"checked":""} onchange="draft.cTruth=this.checked;saveDraft()"><span><b>My answers are true.</b> The information and photo I’m submitting are my own and accurate to the best of my knowledge.</span></label>
- `);
-}
-
-/* step 6 pay */
-function step6(){
- wizChrome(6,`
-  <h2 class="q">Payment</h2>
-  <p class="help">One flat fee. Refunded in full if the physician can’t issue your prescription.</p>
   <div class="ordercard">
    <div class="l1"><span>Physician review & prescription</span><span>$50.00</span></div>
    <div class="l1"><span>Delivery to your email + any supplier</span><span>included</span></div>
@@ -684,12 +702,11 @@ function step6(){
 
 /* validators */
 const validators={
- 1:()=> !draft.first.trim()||!draft.last.trim()?"Please enter your name":!draft.dob?"Please enter your date of birth":(ageFromDOB(draft.dob)<18?"Orma Rx is for adults 18+":!draft.sex?"Please select sex at birth":!draft.state?"Please select your state":!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.email)?"Please enter a valid email":true),
- 2:()=> !draft.sType?"Select your study type":draft.sMonth===null||!draft.sYear?"Select the study month and year":draft.ahi===""||isNaN(parseFloat(draft.ahi))?"Enter your AHI (it’s on your report)":!draft.dxed?"Tell us if you were told you have sleep apnea":!draft.pattern?"Select the apnea type (or “Not sure”)":true,
- 3:()=> !draft.hFt||!draft.hIn||!draft.wLb?"Please enter height and weight":!draft.opioids?"Please answer the opioid question":(draft.symptoms.length===0?"Select your symptoms (or “None of these”)":(draft.conds.length===0?"Select your conditions (or “None of these”)":(draft.safety.length===0?"Answer the safety list (or “None of these”)":true))),
+ 1:()=> draft.report?true:"Upload your sleep study report (or use the sample) to continue",
+ 2:()=> !draft.first.trim()||!draft.last.trim()?"Please enter your name":!draft.dob?"Please enter your date of birth":(ageFromDOB(draft.dob)<18?"Orma Rx is for adults 18+":!draft.sex?"Please select sex at birth":!draft.state?"Please select your state":!draft.sType?"Select your study type":draft.sMonth===null||!draft.sYear?"Select the study month and year":draft.ahi===""||isNaN(parseFloat(draft.ahi))?"Enter your AHI (it’s on your report)":!draft.pattern?"Select the apnea type (or “Not sure”)":!draft.dxed?"Tell us if you were told you have sleep apnea":!draft.hFt||!draft.hIn||!draft.wLb?"Please enter height and weight":true),
+ 3:()=> !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.email)?"Please enter a valid email":!draft.opioids?"Please answer the opioid question":(draft.symptoms.length===0?"Select your symptoms (or “None of these”)":(draft.conds.length===0?"Select your conditions (or “None of these”)":(draft.safety.length===0?"Answer the safety list (or “None of these”)":true))),
  4:()=> draft.photo?true:"The airway photo is required before physician review — take, upload, or use the sample",
- 5:()=> !draft.cTele?"Please check the telehealth consent":!draft.cTruth?"Please confirm your answers are true":true,
- 6:()=> true
+ 5:()=> !draft.cTele?"Please check the telehealth consent":!draft.cTruth?"Please confirm your answers are true":true
 };
 function submitDraft(){
  const sub={...draft,id:"u"+Date.now(),ts:Date.now(),sample:false};
@@ -798,7 +815,7 @@ function vCase(id){
   </div>
 
   <details class="intake"><summary>Full intake — every answer</summary><div class="body">
-   ${[["DOB",c.dob],["Email",c.email],["Phone",c.phone||"—"],["Height",c.hFt&&c.hIn?c.hFt+"′"+c.hIn+"″":"—"],["Weight",c.wLb?c.wLb+" lb":"—"],["BMI",b||"—"],["Symptoms",c.symptoms.join(", ")||"none"],["Conditions",c.conds.join(", ")||"none"],["Daily opioids",c.opioids||"—"],["Safety flags",(c.safety||[]).filter(x=>x!=="None of these").join("; ")||"none"],["Meds / allergies",c.meds||"—"],["Told has sleep apnea",c.dxed||"—"],["Telehealth consent",c.cTele?"✓":"✗"],["Truthfulness attestation",c.cTruth?"✓":"✗"]].map(r=>`<div class="sumrow"><span class="k">${esc(r[0])}</span><span class="v">${esc(String(r[1]))}</span></div>`).join("")}
+   ${[["DOB",c.dob],["Email",c.email],["Phone",c.phone||"—"],["Address",c.address||"—"],["Height",c.hFt&&c.hIn?c.hFt+"′"+c.hIn+"″":"—"],["Weight",c.wLb?c.wLb+" lb":"—"],["BMI",b||"—"],["Symptoms",c.symptoms.join(", ")||"none"],["Conditions",c.conds.join(", ")||"none"],["Daily opioids",c.opioids||"—"],["Safety flags",(c.safety||[]).filter(x=>x!=="None of these").join("; ")||"none"],["Meds / allergies",c.meds||"—"],["Told has sleep apnea",c.dxed||"—"],["Telehealth consent",c.cTele?"✓":"✗"],["Truthfulness attestation",c.cTruth?"✓":"✗"]].map(r=>`<div class="sumrow"><span class="k">${esc(r[0])}</span><span class="v">${esc(String(r[1]))}</span></div>`).join("")}
   </div></details>
   </div>
 
@@ -859,7 +876,7 @@ function vRx(id){
   <div class="rxsheet">
    <div class="watermark"><span>SPECIMEN · TEST BUILD</span></div>
    <div class="lh">${oring(34)}<div class="t">Orma Rx<small>Prescription — Positive Airway Pressure Therapy · ${new Date(s.ts).toLocaleDateString()}</small></div></div>
-   <div class="blk"><h4>Patient</h4>${esc(c.first)} ${esc(c.last)} · DOB ${esc(c.dob)} · ${esc(c.state)}</div>
+   <div class="blk"><h4>Patient</h4>${esc(c.first)} ${esc(c.last)} · DOB ${esc(c.dob)} · ${c.address?esc(c.address)+", ":""}${esc(c.state)}</div>
    <div class="blk"><h4>Diagnosis</h4>${rx.dx}</div>
    <div class="blk"><h4>Prescription</h4><div class="rxbody">
     <b>${esc(s.device)}</b>, pressure ${esc(s.pressure)}<br>${rx.humid}<br>${rx.supplies}<br>Length of need: ${rx.lon} · Valid at the supplier of patient’s choice
@@ -872,7 +889,7 @@ function vRx(id){
 }
 
 /* wizard dispatch */
-function vWizard(step){switch(step){case 1:step1();break;case 2:step2();break;case 3:step3();break;case 4:step4();break;case 5:step5();break;case 6:step6();break;default:step1();}}
+function vWizard(step){switch(step){case 1:step1();break;case 2:step2();break;case 3:step3();break;case 4:step4();break;case 5:step5();break;default:step1();}}
 
 render();
 </script>
