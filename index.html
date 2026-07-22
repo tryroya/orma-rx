@@ -229,8 +229,43 @@ details.intake .body{padding:0 16px 12px}
   .shell{padding:0;max-width:none}
   .rxsheet{border:0;box-shadow:none}
 }
-@media (min-width:700px){
-  .hero h1{font-size:31px}
+/* queue sections + completed examples */
+.learnnote{background:#F2FAFB;border:1px solid #D5ECEF;border-radius:14px;padding:12px 14px;font-size:13px;color:var(--ink);margin-bottom:14px;line-height:1.5}
+.seclabel{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.06em;text-transform:uppercase;margin:18px 0 8px}
+.seclabel small{font-weight:400;text-transform:none;letter-spacing:0}
+.qlist{display:grid;gap:10px;grid-template-columns:1fr}
+.qlist .qcard{margin-bottom:0}
+.pill.decl{background:#F0F3F4;color:#5E7A83}
+.signedbanner.decl{background:#F6F7F8;border-color:#DCE4E7;color:#4A6A74}
+.docback{background:rgba(255,255,255,.14);color:#fff;border-radius:12px;width:36px;height:36px;font-size:19px;flex:0 0 auto}
+
+/* ===== desktop layout (≥900px) — real desktop UI, company default for all Orma sites ===== */
+@media (min-width:900px){
+  .shell{max-width:1060px;padding:28px 48px 70px}
+  .shell.narrow{max-width:660px;padding:28px 24px 40px}
+  .shell.wide{max-width:1200px}
+  .navbar{position:static;background:none;padding:6px 0 34px}
+  .navbar .in{max-width:660px;margin:0 auto;justify-content:flex-end;padding:0 24px}
+  .navbar .cta{width:auto;min-width:240px}
+  .brand{padding:10px 0 8px}
+  .brand .wm{font-size:24px}
+  .hero{padding:54px 56px;border-radius:30px}
+  .hero h1{font-size:44px;max-width:19ch}
+  .hero p.sub{font-size:17px;max-width:52ch}
+  .hero .ringbg{width:300px;height:300px;right:-70px;top:-70px;opacity:.35}
+  .hero .cta{width:auto;padding:16px 38px}
+  .stepscard{grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+  .stepitem{flex-direction:column;align-items:flex-start;gap:10px;padding:22px 20px}
+  .landrow{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:stretch}
+  .landrow .need,.landrow .demohint{margin-top:18px}
+  h2.q{font-size:26px}
+  .center .cta{width:fit-content;margin-left:auto;margin-right:auto;padding:15px 40px}
+  .dochead{margin:-28px -48px 20px;padding:18px 48px}
+  .qlist{grid-template-columns:1fr 1fr;gap:12px}
+  .casegrid{display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-areas:"main side" "action side";column-gap:20px;align-items:start}
+  .colmain{grid-area:main}.colside{grid-area:side}.actionarea{grid-area:action}
+  .colside .row2{grid-template-columns:1fr}
+  .rxsheet{padding:44px 46px}
 }
 </style>
 </head>
@@ -269,6 +304,8 @@ const store={
   set subs(v){localStorage.setItem("ormaRxSubs",JSON.stringify(v));},
   get signed(){try{return JSON.parse(localStorage.getItem("ormaRxSigned")||"{}");}catch(e){return{};}},
   set signed(v){localStorage.setItem("ormaRxSigned",JSON.stringify(v));},
+  get declined(){try{return JSON.parse(localStorage.getItem("ormaRxDeclined")||"{}");}catch(e){return{};}},
+  set declined(v){localStorage.setItem("ormaRxDeclined",JSON.stringify(v));},
   get draft(){try{return JSON.parse(localStorage.getItem("ormaRxDraft")||"null");}catch(e){return null;}},
   set draft(v){localStorage.setItem("ormaRxDraft",JSON.stringify(v));}
 };
@@ -292,7 +329,23 @@ const SAMPLES=[
  {id:"s3",sample:true,ts:NOW.getTime()-49*36e5,first:"Raymond",last:"Whitfield",dob:"1959-01-27",sex:"Male",state:"FL",email:"rwhitfield@example.com",phone:"(305) 555-0113",
   sType:"In-lab sleep study",sMonth:4,sYear:2026,ahi:"28.1",dxed:"Yes",pattern:"Mostly central",report:{name:"PSG_report_whitfield.pdf",kind:"pdf"},
   hFt:"5",hIn:"9",wLb:"176",symptoms:["Daytime sleepiness","Morning headaches"],conds:["Heart failure"],opioids:"Yes",safety:[],meds:"Furosemide, carvedilol, oxycodone 10 mg daily",
-  photo:"svg3",photoKind:"sample",cTele:true,cTruth:true}
+  photo:"svg3",photoKind:"sample",cTele:true,cTruth:true},
+ /* completed examples — show how finished reviews look */
+ {id:"s4",sample:true,ts:NOW.getTime()-3*864e5,first:"Janet",last:"Kowalski",dob:"1971-06-19",sex:"Female",state:"AZ",email:"j.kowalski@example.com",phone:"(602) 555-0142",
+  sType:"Home sleep test",sMonth:3,sYear:2026,ahi:"22.7",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"HST_report_kowalski.pdf",kind:"pdf"},
+  hFt:"5",hIn:"6",wLb:"189",symptoms:["Loud snoring","Daytime sleepiness"],conds:["High blood pressure"],opioids:"No",safety:[],meds:"Amlodipine 5 mg",
+  photo:"svg2",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"signed",name:"Dr. Elena Vasquez",ts:NOW.getTime()-2.6*864e5,device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",override:false,rationale:""}},
+ {id:"s5",sample:true,ts:NOW.getTime()-4*864e5,first:"Albert",last:"Nguyen",dob:"1963-11-08",sex:"Male",state:"WA",email:"a.nguyen@example.com",phone:"(206) 555-0177",
+  sType:"In-lab sleep study",sMonth:9,sYear:2019,ahi:"17.9",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"PSG_report_nguyen_2019.pdf",kind:"pdf"},
+  hFt:"5",hIn:"11",wLb:"204",symptoms:["Loud snoring","Daytime sleepiness"],conds:["None of these"],opioids:"No",safety:[],meds:"",
+  photo:"svg3",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"declined",name:"Dr. Elena Vasquez",ts:NOW.getTime()-3.5*864e5,note:"Thank you for your Orma Rx request. I can’t prescribe from your October 2019 study — it’s outside the 5-year window, and suppliers and insurers want recent numbers.\n\nWhat to do next: a new home sleep test gives current results in about a week. Once you have the report, resubmit and I’ll finish your review quickly.\n\nYour $50 has been refunded in full."}},
+ {id:"s6",sample:true,ts:NOW.getTime()-5*864e5,first:"Grace",last:"Ellison",dob:"1979-02-14",sex:"Female",state:"CO",email:"g.ellison@example.com",phone:"(720) 555-0126",
+  sType:"Home sleep test",sMonth:4,sYear:2026,ahi:"7.8",dxed:"Yes",pattern:"Mostly obstructive",report:{name:"HST_report_ellison.pdf",kind:"pdf"},
+  hFt:"5",hIn:"5",wLb:"151",symptoms:["Loud snoring","Breathing pauses seen by someone else"],conds:["None of these"],opioids:"No",safety:[],meds:"",
+  photo:"svg1",photoKind:"sample",cTele:true,cTruth:true,
+  outcome:{type:"signed",name:"Dr. Elena Vasquez",ts:NOW.getTime()-4.4*864e5,device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",override:true,rationale:"AHI 7.8 under-calls it: partner reports nightly witnessed apneas and the attached report notes Epworth 14/24 — clinically significant despite the mild index. A PAP trial is warranted."}}
 ];
 function allCases(){const local=store.subs.slice().sort((a,b)=>b.ts-a.ts);return [...local,...SAMPLES];}
 function getCase(id){return allCases().find(c=>c.id===id);}
@@ -378,12 +431,14 @@ function vLanding(){
    <div class="stepitem"><div class="n">3</div><div><b>Physician review & prescription</b><small>A licensed sleep physician reviews and, if appropriate, signs. Use it at any CPAP supplier.</small></div></div>
   </div>
   <div class="trust"><span>Reviewed by licensed sleep physicians</span><span>Valid at the supplier of your choice</span><span>Full refund if not prescribed</span></div>
+  <div class="landrow">
   <div class="need"><h3>WHAT YOU’LL NEED</h3><ul>
-    <li>Your sleep-study results (the AHI number — we’ll show you where to find it)</li>
-    <li>About 5 minutes</li>
-    <li>Your phone’s front camera</li></ul>
+    <li>Sleep study report</li>
+    <li>Less than 5 min</li>
+    <li>Phone’s front camera</li></ul>
   </div>
   <div class="demohint">🧪 <b>Demo tip:</b> after you submit, open the <a href="#/doctor" style="color:inherit;font-weight:700">Physician view</a> to see your own case scored and sign it like a reviewer would.</div>
+  </div>
   <footer>
     Orma Rx is a physician-review service operated with independent licensed physicians. It does not diagnose any medical condition and requires existing sleep-study results. Not for emergencies — if you have severe trouble breathing, call 911.<br><br>
     <b>Test build</b> — for product feedback only. No real prescriptions are issued, no payment is charged, and nothing you enter leaves this device.<br><br>
@@ -392,12 +447,12 @@ function vLanding(){
  </div>`;
 }
 function startApply(){draft=store.draft||blankDraft();nav("#/apply/1");}
-function resetDemo(){localStorage.removeItem("ormaRxSubs");localStorage.removeItem("ormaRxSigned");localStorage.removeItem("ormaRxDraft");draft=blankDraft();toast("Demo reset");nav("#/");render();}
+function resetDemo(){localStorage.removeItem("ormaRxSubs");localStorage.removeItem("ormaRxSigned");localStorage.removeItem("ormaRxDeclined");localStorage.removeItem("ormaRxDraft");draft=blankDraft();toast("Demo reset");nav("#/");render();}
 
 /* ============ wizard ============ */
 const STEPS=["Basics","Sleep study","Health","Photo","Review","Payment"];
 function wizChrome(step,inner,nextLabel){
- app.innerHTML=`<div class="shell view">
+ app.innerHTML=`<div class="shell narrow view">
   <div class="wiztop">
    <button class="backbtn" onclick="wizBack(${step})">‹</button>
    <div class="prog"><div class="lbl"><span>${STEPS[step-1]}</span><span>Step ${step} of 6 · ~5 min</span></div>
@@ -645,7 +700,7 @@ function submitDraft(){
 
 /* done */
 function vDone(){
- app.innerHTML=`<div class="shell view center">
+ app.innerHTML=`<div class="shell narrow view center">
   <div class="bigcheck">✓</div>
   <h2 class="q" style="font-size:24px">You’re all set</h2>
   <p class="help" style="max-width:32ch;margin:6px auto 0">Your request is in the physician queue. Most reviews finish within 24 hours.</p>
@@ -663,18 +718,27 @@ function vDone(){
 /* ============ doctor ============ */
 function initials(c){return (c.first[0]||"")+(c.last[0]||"");}
 function agoStr(ts){const h=Math.round((Date.now()-ts)/36e5);if(h<1)return "just now";if(h<24)return h+"h ago";return Math.round(h/24)+"d ago";}
+function caseStatus(c){
+ return {s:store.signed[c.id]||((c.outcome&&c.outcome.type==="signed")?c.outcome:null),
+         d:store.declined[c.id]||((c.outcome&&c.outcome.type==="declined")?c.outcome:null)};
+}
 function vQueue(){
- const cases=allCases();const signed=store.signed;
- app.innerHTML=`<div class="shell wide view">
-  <div class="dochead noprint">${oring(26)}<div class="wm">Orma Rx — Physician review<small>Pre-review ruleset v0.1 · every check shows its basis · you decide</small></div>
-   <div class="right"><button onclick="showRuleset()">Ruleset</button><button onclick="nav('#/')">Patient app</button></div></div>
-  ${cases.map(c=>{const v=evaluate(c);const s=signed[c.id];
-   return `<div class="qcard" onclick="nav('#/doctor/${c.id}')">
+ const pend=[],done=[];
+ allCases().forEach(c=>{const {s,d}=caseStatus(c);if(s||d)done.push({c,s,d});else pend.push(c);});
+ const card=(c,pill)=>`<div class="qcard" onclick="nav('#/doctor/${c.id}')">
     <div class="avatar">${esc(initials(c))}</div>
     <div class="mid"><div class="nm">${esc(c.first)} ${esc(c.last)} ${c.sample?"":'<span class="tagyou">YOUR TEST</span>'}</div>
     <div class="meta">${ageFromDOB(c.dob)} ${c.sex?c.sex[0]:""} · AHI ${esc(c.ahi)} · ${esc(c.sType||"—")} · ${agoStr(c.ts)}</div></div>
-    ${s?`<span class="pill done">✓ Signed</span>`:`<span class="pill ${v.green?"ok":"bad"}">${v.green?"● Meets criteria":"● Review needed"}</span>`}
-   </div>`;}).join("")}
+    ${pill}
+   </div>`;
+ app.innerHTML=`<div class="shell wide view">
+  <div class="dochead noprint">${oring(26)}<div class="wm">Orma Rx — Physician review<small>Pre-review ruleset v0.1 · every check shows its basis · you decide</small></div>
+   <div class="right"><button onclick="showRuleset()">Ruleset</button><button onclick="nav('#/')">Patient app</button></div></div>
+  <div class="learnnote">🧠 <b>It learns from you:</b> every decision you record here — a sign-off, a decline, a note, an override — teaches the pre-review how you read cases, so its green/red calls get more accurate over time.</div>
+  <div class="seclabel">In queue · ${pend.length}</div>
+  <div class="qlist">${pend.map(c=>{const v=evaluate(c);return card(c,`<span class="pill ${v.green?"ok":"bad"}">${v.green?"● Meets criteria":"● Review needed"}</span>`);}).join("")||'<div style="font-size:13px;color:var(--mut)">Queue is empty — submit a test case from the patient app.</div>'}</div>
+  <div class="seclabel">Completed <small>— worked examples: a clean sign-off, a decline with refund, a documented override</small></div>
+  <div class="qlist">${done.map(({c,s})=>card(c,s?`<span class="pill done">✓ Signed${s.override?" · override":""}</span>`:`<span class="pill decl">✕ Not prescribed</span>`)).join("")}</div>
   <div style="font-size:12px;color:var(--mut);margin-top:14px">Automated pre-review orders the queue and shows its work — the prescribing decision is always the physician’s. Sample cases are fictional. <a href="javascript:resetDemo()">Restart demo</a></div>
  </div>`;
 }
@@ -699,12 +763,21 @@ function photoHtml(c){
 }
 function vCase(id){
  const c=getCase(id);if(!c)return nav("#/doctor");
- const v=evaluate(c);const s=store.signed[id];const b=bmi(c);
+ const v=evaluate(c);const b=bmi(c);
+ const {s,d}=caseStatus(c);
  const fails=v.checks.filter(x=>!x.pass);
+ const action=s
+  ?`<div class="signedbanner"><span>✓ Signed by ${esc(s.name)} · ${new Date(s.ts).toLocaleString()}</span><a href="#/rx/${id}">View prescription →</a></div>`
+   +(s.override?`<div class="dcard"><h3>Override rationale (documented)</h3><div style="font-size:13.5px;line-height:1.6">${esc(s.rationale||"")}</div><div style="font-size:12px;color:var(--mut);margin-top:8px">Override logged — corrections like this tune the pre-review for future cases.</div></div>`:"")
+  :d
+  ?`<div class="signedbanner decl"><span>✕ Not prescribed — note sent & $50 refunded${d.name?" · "+esc(d.name):""} · ${new Date(d.ts).toLocaleDateString()}</span></div>
+    <div class="dcard"><h3>Note sent to patient</h3><div style="font-size:13.5px;line-height:1.6;white-space:pre-wrap">${esc(d.note||"")}</div></div>`
+  :v.green?signBox(id,c,false):redActions(id,c,fails);
  app.innerHTML=`<div class="shell wide view">
-  <div class="dochead noprint">${oring(26)}<div class="wm">${esc(c.first)} ${esc(c.last)}<small>${ageFromDOB(c.dob)}-year-old ${esc((c.sex||"").toLowerCase())} · ${esc(c.state)} · submitted ${agoStr(c.ts)}</small></div>
-   <div class="right"><button onclick="nav('#/doctor')">‹ Queue</button></div></div>
-
+  <div class="dochead noprint"><button class="docback" onclick="nav('#/doctor')" aria-label="Back to patient list">‹</button>${oring(26)}<div class="wm">${esc(c.first)} ${esc(c.last)}<small>${ageFromDOB(c.dob)}-year-old ${esc((c.sex||"").toLowerCase())} · ${esc(c.state)} · submitted ${agoStr(c.ts)}</small></div>
+   <div class="right"><button onclick="nav('#/doctor')">‹ Patient list</button></div></div>
+  <div class="casegrid">
+  <div class="colmain">
   <div class="verdict ${v.green?"ok":"bad"}">
    <div class="big">${v.green?"✅ Meets CPAP prescription criteria":"⚠️ Does not meet criteria"}<span class="cnt">${v.passed}/${v.total}</span></div>
    <div class="sub">${v.green?"All checks passed — review the evidence below and sign.":fails.length+" check"+(fails.length>1?"s":"")+" failed: "+fails.map(f=>f.label).join(" · ")}</div>
@@ -714,7 +787,9 @@ function vCase(id){
    <div class="foot">Automated pre-review against ruleset v0.1 (<a href="javascript:showRuleset()">view</a>). It checks completeness and criteria only — the prescribing decision is yours. The airway photo is never machine-analyzed.</div></div>
 
   <div class="checks">${v.checks.map(k=>`<div class="checkrow"><div class="ic ${k.pass?"ok":"bad"}">${k.pass?"✓":"✕"}</div><div><b>${k.label}</b><small>${k.evidence}</small></div></div>`).join("")}</div>
+  </div>
 
+  <div class="colside">
   <div class="row2" style="align-items:start">
    <div class="dcard"><h3>Airway photo</h3>${photoHtml(c)}</div>
    <div class="dcard"><h3>Sleep study</h3>
@@ -725,9 +800,11 @@ function vCase(id){
   <details class="intake"><summary>Full intake — every answer</summary><div class="body">
    ${[["DOB",c.dob],["Email",c.email],["Phone",c.phone||"—"],["Height",c.hFt&&c.hIn?c.hFt+"′"+c.hIn+"″":"—"],["Weight",c.wLb?c.wLb+" lb":"—"],["BMI",b||"—"],["Symptoms",c.symptoms.join(", ")||"none"],["Conditions",c.conds.join(", ")||"none"],["Daily opioids",c.opioids||"—"],["Safety flags",(c.safety||[]).filter(x=>x!=="None of these").join("; ")||"none"],["Meds / allergies",c.meds||"—"],["Told has sleep apnea",c.dxed||"—"],["Telehealth consent",c.cTele?"✓":"✗"],["Truthfulness attestation",c.cTruth?"✓":"✗"]].map(r=>`<div class="sumrow"><span class="k">${esc(r[0])}</span><span class="v">${esc(String(r[1]))}</span></div>`).join("")}
   </div></details>
+  </div>
 
-  ${s?`<div class="signedbanner"><span>✓ Signed by ${esc(s.name)} · ${new Date(s.ts).toLocaleString()}</span><a href="#/rx/${id}">View prescription →</a></div>`
-    :v.green?signBox(id,c,false):redActions(id,c,fails)}
+  <div class="actionarea">${action}
+  <button class="ghostbtn noprint" onclick="nav('#/doctor')">‹ Back to patient list</button></div>
+  </div>
  </div>`;
 }
 function rxDefaults(c){return {device:"APAP (auto-adjusting positive airway pressure)",pressure:"4–20 cm H₂O",humid:"Heated humidifier",supplies:"Mask and headgear of patient’s choice with fitting; tubing and filters; replacement supplies per standard schedule",dx:"G47.33 — Obstructive sleep apnea",lon:"99 months (lifetime need)"};}
@@ -752,9 +829,14 @@ function redActions(id,c,fails){
  return `<div class="dcard" id="redactions"><h3>Decision</h3>
   <div class="fgroup"><label class="f">Note to patient (prefilled from the failed checks — edit freely)</label>
   <textarea class="tin" id="declinenote" rows="7">${esc(note)}</textarea></div>
-  <button class="declinebtn" onclick="toast('Demo: note sent to patient + $50 refund issued');nav('#/doctor')">Send note & refund $50 (demo)</button>
+  <button class="declinebtn" onclick="doDecline('${id}')">Send note & refund $50 (demo)</button>
   <button class="ghostbtn" onclick="overrideSign('${id}')">Sign anyway — document clinical rationale</button>
  </div>`;
+}
+function doDecline(id){
+ const note=$("#declinenote")?$("#declinenote").value.trim():"";
+ const d=store.declined;d[id]={ts:Date.now(),note};store.declined=d;
+ toast("Demo: note sent to patient + $50 refund issued");nav("#/doctor");
 }
 function overrideSign(id){const c=getCase(id);const el=$("#redactions");if(el&&c)el.outerHTML=signBox(id,c,true);}
 function doSign(id,isOverride){
@@ -767,9 +849,9 @@ function doSign(id,isOverride){
 
 /* rx doc */
 function vRx(id){
- const c=getCase(id);const s=store.signed[id];if(!c||!s)return nav("#/doctor");
+ const c=getCase(id);const s=c?caseStatus(c).s:null;if(!c||!s)return nav("#/doctor");
  const rx=rxDefaults(c);
- app.innerHTML=`<div class="shell view">
+ app.innerHTML=`<div class="shell narrow view">
   <div class="noprint" style="display:flex;gap:10px;margin-bottom:14px">
    <button class="backbtn" onclick="nav('#/doctor/${id}')">‹</button>
    <button class="cta" style="margin:0;flex:1" onclick="window.print()">🖨 Print / save as PDF</button>
